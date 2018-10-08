@@ -123,3 +123,7 @@ export enum Granularity {
   Minute,
   ThirtyMinute
 }
+export enum SystemTimeTransform {
+  GASDAY66 = 1,
+  THERMALYEAR = 2
+}

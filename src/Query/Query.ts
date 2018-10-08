@@ -40,7 +40,7 @@ export class Query {
     this._queryParams.tz = tz;
     return this;
   }
-  InAbsoulteDateRange(start: Date, end: Date) {
+  InAbsoluteDateRange(start: Date, end: Date) {
     this._queryParams.extractionRange = {
       tag: ExtractionRangeType.DateRange,
       Start: start,
@@ -73,6 +73,6 @@ export class Query {
     }
   }
   getUrlQueryParams(q: QueryParams) {
-    return q.tz ? "tr=" + q.tz : "";
+    return q.tz ? "tz=" + q.tz : "";
   }
 }

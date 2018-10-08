@@ -7,5 +7,5 @@ This Library provides read access to the Artesian API
 ### Installation
 This library is provided by npm.
 ```
-npm install --save 
+npm install artesian --save 
 ```

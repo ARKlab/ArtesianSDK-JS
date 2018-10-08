@@ -65,3 +65,5 @@ export function FromAuth0Config(cfg: {
 }) {
   return new QueryService(createAuth0Config(cfg));
 }
+
+export { Granularity, RelativeIntervalType, SystemTimeTransform } from "./Data/Query";

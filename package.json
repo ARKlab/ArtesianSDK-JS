@@ -1,21 +1,32 @@
 {
-  "name": "artesian-sdk",
+  "name": "artesian",
   "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "./dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc -p ./config/tsconfig.json"
+    "test": "jest",
+    "dev": "jest --watch",
+    "build": "node ./scripts/build.js"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "axios": "^0.18.0"
   },
   "devDependencies": {
+    "@types/jest": "^23.3.3",
+    "@types/moxios": "^0.4.8",
     "es6-promise": "^4.2.5",
+    "fs-extra": "^7.0.0",
+    "jest": "^23.6.0",
+    "moxios": "^0.4.0",
+    "ts-jest": "^23.10.4",
+    "ts-loader": "^5.2.1",
     "tslint": "^5.11.0",
-    "typescript": "^3.1.1"
-  }
+    "typescript": "^3.1.1",
+    "webpack": "^4.20.2",
+    "webpack-cli": "^3.1.2"
+  },
+  "typings": "./dist/index.d.ts"
 }

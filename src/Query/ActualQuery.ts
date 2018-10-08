@@ -41,7 +41,7 @@ export class ActualQuery extends Query {
         `?${this.getUrlQueryParams(q)}`
     );
   }
-  execute(): Promise<ActualRow[]> {
+  Execute(): Promise<ActualRow[]> {
     return this.buildUrl()
       .then(url => this.client.get<InternalActualRow[]>(url))
       .then(res => res.data.map(actualMapper));
