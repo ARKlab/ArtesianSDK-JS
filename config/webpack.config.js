@@ -1,5 +1,4 @@
 const path = require("path");
-const EmitAllPlugin = require("webpack-emit-all-plugin");
 
 module.exports = [
   {

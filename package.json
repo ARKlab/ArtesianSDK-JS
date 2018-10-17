@@ -1,7 +1,7 @@
 {
-  "name": "artesian",
+  "name": "artesian-sdk",
   "version": "0.0.1",
-  "description": "",
+  "description": "Artesian SDK",
   "main": "./dist/index.js",
   "scripts": {
     "test": "jest",
@@ -9,7 +9,12 @@
     "build": "node ./scripts/build.js"
   },
   "keywords": [],
-  "author": "",
+  "homepage": "https://github.com/ARKlab/ArtesianSDK-JS",
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/ARKlab/ArtesianSDK-JS.git"
+  },
+  "author": "ark-energy",
   "license": "MIT",
   "dependencies": {
     "axios": "^0.18.0"

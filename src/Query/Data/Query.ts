@@ -30,30 +30,25 @@ export type MasQueryParams = QueryParams & {
   products: string[];
 };
 
-export type VersionSelection =
-  | LastN
-  | MUV
-  | LastOfDays
-  | LastOfMonths
-  | Version;
+export type VersionSelection = LastN | MUV | LastOf | Version;
 export type LastN = { tag: VersionSelectionType.LastN; val: number };
 export type MUV = { tag: VersionSelectionType.MUV };
-export type LastOfDays = {
-  tag: VersionSelectionType.LastOfDays;
-  start: Date;
-  end: Date;
+export type LastOf = {
+  tag: VersionSelectionType.LastOf;
+  lastOfType: LastOfType;
+  extraction: LastOfExtractionType;
 };
-export type LastOfMonths = {
-  tag: VersionSelectionType.LastOfMonths;
-  start: Date;
-  end: Date;
-};
+
+export enum LastOfType {
+  Days,
+  Months
+}
+export type LastOfExtractionType = DateRange | Period | PeriodRange;
 export type Version = { tag: VersionSelectionType.Version; val: Date };
 export enum VersionSelectionType {
   LastN,
   MUV,
-  LastOfDays,
-  LastOfMonths,
+  LastOf,
   Version
 }
 export type CurveSelection = IdSelection | FilterSelection;
@@ -79,17 +74,17 @@ export type ExtractionRange =
 
 export type DateRange = {
   tag: ExtractionRangeType.DateRange;
-  Start: Date;
-  End: Date;
+  start: Date;
+  end: Date;
 };
 export type Period = {
   tag: ExtractionRangeType.Period;
-  Period: Date;
+  Period: string;
 };
 export type PeriodRange = {
   tag: ExtractionRangeType.PeriodRange;
-  PeriodFrom: Date;
-  PeriodTo: Date;
+  PeriodFrom: string;
+  PeriodTo: string;
 };
 export type RelativeInterval = {
   tag: ExtractionRangeType.RelativeInterval;

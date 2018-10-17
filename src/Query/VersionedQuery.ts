@@ -1,18 +1,148 @@
-import { Query } from "./Query";
+import * as Q from "./Query";
 import {
   VersionedQueryParams,
   VersionSelectionType,
   Granularity,
   getCurveSelectionParams,
   addTimeTransformQueryParam,
-  LastOfDays,
-  LastOfMonths
+  LastOfType,
+  ExtractionRangeType,
+  LastOf,
+  LastOfExtractionType
 } from "./Data/Query";
 import {
   InternalVersionedRow,
   versionedMapper,
   VersionedRow
 } from "./Data/Response";
+
+export class VersionedQuery extends Q.Query {
+  _queryParams: Partial<VersionedQueryParams>;
+  /**
+   * Set the granularity of the extracted marketdata
+   * @param g The granulairty in which to extract data
+   */
+  InGranularity(g: Granularity) {
+    this._queryParams.granularity = g;
+    return this;
+  }
+  /**
+   * Set the time transform to be applied to extraction
+   * @param tr The Time Tramsform id to be applied to the extraction
+   */
+  WithTimeTransform(tr: number) {
+    this._queryParams.tr = tr;
+    return this;
+  }
+  /**
+   * Set the number of versions to retrieve in the extraction
+   * @param n The number of previous versions to extract
+   */
+  ForLastNVersions(n: number) {
+    this._queryParams.versionSelection = {
+      tag: VersionSelectionType.LastN,
+      val: n
+    };
+    return this;
+  }
+  /**
+   * Set the version selection type to MUV
+   */
+  ForMuv() {
+    this._queryParams.versionSelection = {
+      tag: VersionSelectionType.MUV
+    };
+    return this;
+  }
+  /**
+   * Set Last Of Days date range version selection
+   * @param extraction the extraction selection
+   */
+  ForLastOfDays(extraction: LastOfExtractionType) {
+    if (
+      Object.keys(ExtractionRangeType).indexOf(extraction.tag.toString()) == -1
+    )
+      throw "Not a valid extraction";
+    this._queryParams.versionSelection = {
+      tag: VersionSelectionType.LastOf,
+      lastOfType: LastOfType.Days,
+      extraction
+    };
+    return this;
+  }
+  /**
+   * Set Last Of Months date range version selection
+   * @param extraction the extraction selection
+   */
+  ForLastOfMonths(extraction: LastOfExtractionType) {
+    if (
+      Object.keys(ExtractionRangeType).indexOf(extraction.tag.toString()) == -1
+    )
+      throw "Not a valid extraction";
+    this._queryParams.versionSelection = {
+      tag: VersionSelectionType.LastOf,
+      lastOfType: LastOfType.Months,
+      extraction
+    };
+    return this;
+  }
+  /**
+   * Set specific version selection
+   * @param val Date time of the version to be extracted
+   */
+  ForVersion(val: Date) {
+    this._queryParams.versionSelection = {
+      tag: VersionSelectionType.Version,
+      val
+    };
+    return this;
+  }
+  /**
+   * Execute the query
+   */
+  Execute(): Promise<VersionedRow[]> {
+    return buildUrl(this._queryParams)
+      .then(url => this.client.get<InternalVersionedRow[]>(url))
+      .then(res => res.data.map(versionedMapper));
+  }
+}
+/**
+ * Create a version extraction range with dates
+ * @param start start date of version range
+ * @param end end date of version range
+ */
+export function inDateRange(start: Date, end: Date): LastOfExtractionType {
+  return {
+    tag: ExtractionRangeType.DateRange,
+    start,
+    end
+  };
+}
+/**
+ * Create a version extraction range with a period
+ * @param period the period of the version range
+ */
+export function inPeriod(period: string): LastOfExtractionType {
+  return {
+    tag: ExtractionRangeType.Period,
+    Period: period
+  };
+}
+/**
+ * Create a version extraction range with a start and an end period
+ * @param start start of period range
+ * @param end end of period range
+ */
+export function inPeriodRange(
+  start: string,
+  end: string
+): LastOfExtractionType {
+  return {
+    tag: ExtractionRangeType.PeriodRange,
+    PeriodFrom: start,
+    PeriodTo: end
+  };
+}
 
 function formatDate(d: Date) {
   return d.toISOString().split("T")[0];
@@ -27,98 +157,62 @@ function validateVersionParams(
   return Promise.resolve(q as VersionedQueryParams);
 }
 
-function buildVersionRoute(q: LastOfDays | LastOfMonths): string {
-  return (
-    `${VersionSelectionType[q.tag]}/` +
-    `${formatDate(q.start)}/` +
-    `${formatDate(q.end)}`
+function buildLastOfRoute(q: LastOf): string {
+  switch (q.extraction.tag) {
+    case ExtractionRangeType.DateRange:
+      return (
+        `${VersionSelectionType[q.tag]}${LastOfType[q.lastOfType]}/` +
+        `${formatDate(q.extraction.start)}/` +
+        `${formatDate(q.extraction.end)}`
+      );
+    case ExtractionRangeType.Period:
+      return (
+        `${VersionSelectionType[q.tag]}${LastOfType[q.lastOfType]}/` +
+        `${q.extraction.Period}/`
+      );
+    case ExtractionRangeType.PeriodRange:
+      return (
+        `${VersionSelectionType[q.tag]}${LastOfType[q.lastOfType]}/` +
+        `${q.extraction.PeriodFrom}/` +
+        `${q.extraction.PeriodTo}`
+      );
+  }
+}
+function validateQuery(
+  q: Partial<VersionedQueryParams>
+): Promise<VersionedQueryParams> {
+  return Q.validateQuery(q).then(() => validateVersionParams(q));
+}
+function buildUrl(q: Partial<VersionedQueryParams>): Promise<string> {
+  return validateQuery(q).then(
+    q =>
+      "vts/" +
+      `${buildVersionRoute(q)}/` +
+      `${Granularity[q.granularity]}/` +
+      `${Q.buildExtractionRangeRoute(q)}` +
+      `?${getUrlQueryParams(q)}`
   );
 }
-export class VersionedQuery extends Query {
-  _queryParams: Partial<VersionedQueryParams>;
-  _routePrefix = "vts";
-  InGranularity(g: Granularity) {
-    this._queryParams.granularity = g;
-    return this;
+function buildVersionRoute(q: VersionedQueryParams): string {
+  switch (q.versionSelection.tag) {
+    case VersionSelectionType.LastN:
+      return "Last" + q.versionSelection.val;
+    case VersionSelectionType.MUV:
+      return "MUV";
+    case VersionSelectionType.Version:
+      return "Version/" + q.versionSelection.val.toISOString().split(".")[0];
+    case VersionSelectionType.LastN:
+      return "Last" + q.versionSelection.val;
+    case VersionSelectionType.LastOf:
+      return buildLastOfRoute(q.versionSelection);
   }
-  ForLastNVersions(n: number) {
-    this._queryParams.versionSelection = {
-      tag: VersionSelectionType.LastN,
-      val: n
-    };
-    return this;
-  }
-  ForMuv() {
-    this._queryParams.versionSelection = {
-      tag: VersionSelectionType.MUV
-    };
-    return this;
-  }
-  ForLastOfDays(start: Date, end: Date) {
-    this._queryParams.versionSelection = {
-      tag: VersionSelectionType.LastOfDays,
-      start,
-      end
-    };
-    return this;
-  }
-  ForLastOfMonths(start: Date, end: Date) {
-    this._queryParams.versionSelection = {
-      tag: VersionSelectionType.LastOfMonths,
-      start,
-      end
-    };
-    return this;
-  }
-  ForVersion(val: Date) {
-    this._queryParams.versionSelection = {
-      tag: VersionSelectionType.Version,
-      val
-    };
-    return this;
-  }
-  validateQuery(): Promise<VersionedQueryParams> {
-    return super
-      .validateQuery()
-      .then(() => validateVersionParams(this._queryParams));
-  }
-  buildUrl(): Promise<string> {
-    return this.validateQuery().then(
-      q =>
-        `${this._routePrefix}/` +
-        `${this.buildVersionRoute(q)}/` +
-        `${Granularity[q.granularity]}/` +
-        `${this.buildExtractionRangeRoute(q)}` +
-        `?${this.getUrlQueryParams(q)}`
-    );
-  }
-  buildVersionRoute(q: VersionedQueryParams): string {
-    switch (q.versionSelection.tag) {
-      case VersionSelectionType.LastN:
-        return "Last" + q.versionSelection.val;
-      case VersionSelectionType.MUV:
-        return "MUV";
-      case VersionSelectionType.Version:
-        return "Version/" + q.versionSelection.val;
-      case VersionSelectionType.LastN:
-        return "Last" + q.versionSelection.val;
-      case VersionSelectionType.LastOfDays:
-      case VersionSelectionType.LastOfMonths:
-        return buildVersionRoute(q.versionSelection);
-    }
-  }
-  getUrlQueryParams(q: VersionedQueryParams): string {
-    return [
-      super.getUrlQueryParams(q),
-      getCurveSelectionParams(q),
-      addTimeTransformQueryParam(q)
-    ]
-      .filter(Boolean)
-      .join("&");
-  }
-  execute(): Promise<VersionedRow[]> {
-    return this.buildUrl()
-      .then(url => this.client.get<InternalVersionedRow[]>(url))
-      .then(res => res.data.map(versionedMapper));
-  }
+}
+function getUrlQueryParams(q: VersionedQueryParams): string {
+  return [
+    Q.getUrlQueryParams(q),
+    getCurveSelectionParams(q),
+    addTimeTransformQueryParam(q)
+  ]
+    .filter(Boolean)
+    .join("&");
 }

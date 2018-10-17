@@ -12,7 +12,7 @@ export function createApiKeyConfig(cfg: {
     authType: { tag: "ApiKeyConfig", val: cfg.key }
   };
 }
-export function createAuth0Config(cfg: {
+export function createAuthConfig(cfg: {
   baseUrl: string;
   audience: string;
   domain: string;
