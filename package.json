@@ -1,6 +1,6 @@
 {
   "name": "artesian-sdk",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Artesian SDK",
   "main": "./dist/index.js",
   "scripts": {
@@ -9,10 +9,14 @@
     "build": "node ./scripts/build.js"
   },
   "keywords": [],
+  "files": [
+    "dist",
+    "src"
+  ],
   "homepage": "https://github.com/ARKlab/ArtesianSDK-JS",
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/ARKlab/ArtesianSDK-JS.git"
+    "type": "git",
+    "url": "https://github.com/ARKlab/ArtesianSDK-JS.git"
   },
   "author": "ark-energy",
   "license": "MIT",
