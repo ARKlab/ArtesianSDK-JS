@@ -59,9 +59,9 @@ To construct an Actual Time Series the following must be provided.
 
 | Actual Query           | Description                                                                 |
 | ---------------------- | --------------------------------------------------------------------------- |
-| Curve Selection        | A [curve selection](#Curve-Selection)                                       |
+| Curve Selection        | A [curve selection](#curve-selection)                                       |
 | Time Granularity       | The granularity type (invoke the InGranularity method)                      |
-| Time Extraction Window | An [extraction time window](#Time-Extraction-Window) for data to be queried |
+| Time Extraction Window | An [extraction time window](#time-extraction-window) for data to be queried |
 
 ## Versioned Time Series
 
@@ -82,10 +82,10 @@ To construct an Actual Time Series the following must be provided.
 
 | Versioned Query                  | Description                                                                 |
 | -------------------------------- | --------------------------------------------------------------------------- |
-| Curve Selection                  | A [curve selection](#Curve-Selection)                                       |
+| Curve Selection                  | A [curve selection](#curve-selection)                                       |
 | Time Granularity                 | The granularity type (invoke the InGranularity method)                      |
-| Time Extraction Window           | An [extraction time window](#Time-Extraction-Window) for data to be queried |
-| Versioned Time Extraction Window | A [versioned time extraction window](#Versioned-Time-Extraction-Window)     |
+| Time Extraction Window           | An [extraction time window](#time-extraction-window) for data to be queried |
+| Versioned Time Extraction Window | A [versioned time extraction window](#versioned-time-extraction-window)     |
 
 ## Market Assessment Time Series
 
@@ -105,9 +105,9 @@ To construct an Actual Time Series the following must be provided.
 
 | Versioned Query        | Description                                                                 |
 | ---------------------- | --------------------------------------------------------------------------- |
-| Curve Selection        | A [curve selection](#Curve-Selection)                                       |
+| Curve Selection        | A [curve selection](#curve-selection)                                       |
 | Product                | An array of Products                                                        |
-| Time Extraction Window | An [extraction time window](#Time-Extraction-Window) for data to be queried |
+| Time Extraction Window | An [extraction time window](#time-extraction-window) for data to be queried |
 
 ## Running a Query
 
@@ -137,7 +137,7 @@ qs.CreateActual().ForFilterId(15);
 ## Time Extraction Window
 
 An Extraction Window must be added to every query. To add an extraction use one of the methods below.
-(Note [this section](#Period) decsribes how to create a period string)
+(Note [this section](#period) decsribes how to create a period string)
 
 ```javascript
 import { QueryService } from "artesian-sdk";
@@ -163,7 +163,7 @@ qs.CreateActual().InRelativePeriodRange("P2W", "P20D");
 ## Versioned Time Extraction Window
 
 A Versioned Time Extraction must be added to Versioned Queries. Use one of the methods below to add one.
-(Note creating a version extraction for `ForLastOfDays` and `ForLastOfMonths` is descibed in the [next section](#Version-Extraction))
+(Note creating a version extraction for `ForLastOfDays` and `ForLastOfMonths` is descibed in the [next section](#version-extraction))
 
 ```javascript
 import { QueryService } from "artesian-sdk";
@@ -193,7 +193,7 @@ qs.CreateVersioned().ForLastOfMonths(
 ## Version Extraction
 
 A Version Extraction can be created using the following functions.
-(Note [this section](#Period) describes how to create a period string)
+(Note [this section](#period) describes how to create a period string)
 
 ```javascript
 import { QueryService } from "artesian-sdk";
@@ -231,5 +231,5 @@ Other recommended libraries to build a period string are:
 
 ## Links
 
-- [Github](https://github.com/ARKlab/Artesian.SDK)
+- [Github](https://github.com/ARKlab/ArtesianSDK-JS)
 - [Ark Energy](http://www.ark-energy.eu/)
