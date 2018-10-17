@@ -1,12 +1,13 @@
 {
   "name": "artesian-sdk",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Artesian SDK",
   "main": "./dist/index.js",
   "scripts": {
     "test": "jest",
     "dev": "jest --watch",
-    "build": "node ./scripts/build.js"
+    "build": "node ./scripts/build.js",
+    "prepack":"npm run test && npm run build"
   },
   "keywords": [],
   "files": [

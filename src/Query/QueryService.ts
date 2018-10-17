@@ -7,6 +7,7 @@ import {
 import { ActualQuery } from "./ActualQuery";
 import * as VQ from "./VersionedQuery";
 import { MasQuery } from "./MasQuery";
+import { QueryRoute, QueryVersion } from "./Data/ArtesianConstants";
 
 class QueryService {
   client: AxiosInstance;
@@ -14,9 +15,12 @@ class QueryService {
     function Get<A>(url: string): AxiosPromise<A> {
       switch (cfg.authType.tag) {
         case "ApiKeyConfig":
-          return axios.get<A>(cfg.baseUrl + url, {
-            headers: { "x-api-key": cfg.authType.val }
-          });
+          return axios.get<A>(
+            `${cfg.baseUrl}/${QueryRoute}/${QueryVersion}/${url}`,
+            {
+              headers: { "x-api-key": cfg.authType.val }
+            }
+          );
         case "Auth0Config":
           return axios
             .post(
@@ -32,9 +36,12 @@ class QueryService {
             .then((res: { data: any }) => res.data)
             .then((data: { access_token: string }) => data.access_token)
             .then((token: string) =>
-              axios.get<A>(cfg.baseUrl + url, {
-                headers: `Bearer ${token}`
-              })
+              axios.get<A>(
+                `${cfg.baseUrl}/${QueryRoute}/${QueryVersion}/${url}`,
+                {
+                  headers: `Bearer ${token}`
+                }
+              )
             );
       }
     }

@@ -5,7 +5,7 @@ import { getMoxiosUrl } from "../helpers";
 const { Granularity, RelativeIntervalType } = QueryService;
 
 const cfg = {
-  baseUrl: "https://fake-artesian-env/",
+  baseUrl: "https://fake-artesian-env",
   key: "5418B0DB-7AB9-4875-81BA-6EE609E073B6"
 };
 const qs = QueryService.FromApiKey(cfg);

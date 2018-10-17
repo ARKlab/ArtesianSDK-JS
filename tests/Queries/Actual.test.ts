@@ -5,7 +5,7 @@ import { getMoxiosUrl } from "../helpers";
 const { Granularity, RelativeIntervalType, SystemTimeTransform } = QueryService;
 
 const cfg = {
-  baseUrl: "https://fake-artesian-env/",
+  baseUrl: "https://fake-artesian-env",
   key: "5418B0DB-7AB9-4875-81BA-6EE609E073B6"
 };
 const qs = QueryService.FromApiKey(cfg);
@@ -39,7 +39,7 @@ describe("ActualQueries", () => {
         expect(
           getMoxiosUrl()
             .url.split(cfg.baseUrl)[1]
-            .split("/")[0]
+            .split("/")[3]
         ).toEqual("ts");
       }));
   test("Granularity", () =>
