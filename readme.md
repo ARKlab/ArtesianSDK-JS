@@ -1,6 +1,6 @@
 ![image](https://www.ark-energy.eu/wp-content/uploads/ark-dark.png)
-
 # Artesian.SDK
+[![npm version](https://badge.fury.io/js/artesian-sdk.svg)](https://badge.fury.io/js/artesian-sdk)
 
 This Library provides read access to the Artesian API
 
