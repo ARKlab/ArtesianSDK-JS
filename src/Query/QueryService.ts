@@ -39,7 +39,7 @@ class QueryService {
               axios.get<A>(
                 `${cfg.baseUrl}/${QueryRoute}/${QueryVersion}/${url}`,
                 {
-                  headers: `Bearer ${token}`
+                  headers: { Authorization: `Bearer ${token}` }
                 }
               )
             );
