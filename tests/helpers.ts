@@ -2,16 +2,17 @@ import * as moxios from "moxios";
 
 export function getMoxiosUrl() {
   const {
-    config: { method },
+    config: { method, headers },
     url
   } = moxios.requests.first();
   return {
     method,
+    headers,
     ...splitUrl(url)
   };
 }
 export function splitUrl(urlIn: String) {
-  const [url, qs] = urlIn.split("?");
+  const [url, qs = ""] = urlIn.split("?");
   return {
     url,
     qs: qsToObj(qs)
