@@ -2,7 +2,7 @@ import { Granularity } from "../../Data/Enums";
 
 export type Input = {
   marketDataId: number;
-  eTag: string;
+  eTag?: string;
   providerName: string;
   marketDataName: string;
   originalGranularity: Granularity;
@@ -10,8 +10,8 @@ export type Input = {
   originalTimezone: string;
   aggregationRule: AggregationRule;
   transformId?: number;
-  providerDescription: string;
-  tags: Record<string, string[]>;
+  providerDescription?: string;
+  tags?: Record<string, string[]>;
   path?: string;
 };
 export type Output = Input & {
@@ -30,22 +30,23 @@ export type TimeTransform = {
   definedBy: TransformDefinitionType;
   type: TransformType;
 };
-enum MarketDataType {
+
+export enum MarketDataType {
   ActualTimeSerie,
   VersionedTimeSerie,
   MarketAssessment
 }
-enum AggregationRule {
+export enum AggregationRule {
   Undefined,
   SumAndDivide,
   AverageAndReplicate
 }
 
-enum TransformDefinitionType {
+export enum TransformDefinitionType {
   User,
   System
 }
-enum TransformType {
+export enum TransformType {
   SimpleShift,
   Calendar,
   Composition

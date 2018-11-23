@@ -7,7 +7,7 @@
     "test": "jest",
     "dev": "jest --watch",
     "build": "node ./scripts/build.js",
-    "prepack":"npm run test && npm run build"
+    "prepack": "npm run test && npm run build"
   },
   "keywords": [],
   "files": [

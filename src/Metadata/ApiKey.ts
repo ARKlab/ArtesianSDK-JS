@@ -6,22 +6,44 @@ export class ApiKey {
   constructor(client: AxiosInstance) {
     this._client = client;
   }
+  /**
+   * Create new ApiKey
+   * @param keyRecord the entity we are going to insert
+   * Returns ApiKey Output entity
+   */
   Create(keyRecord: Input) {
     //todo validate
     var url = "/apikey/entity";
 
     return this._client.post<Output>(url, keyRecord);
   }
+  /**
+   * Retrieve the ApiKey entity
+   * @param key The Key
+   * Returns ApiKey Output entity
+   */
   GetByKey(key: string) {
     var url = `/apikey/entity?key=${key}`;
 
     return this._client.get<Output>(url);
   }
+  /**
+   * Retrieve the ApiKey entity
+   * @param id The id
+   * Returns ApiKey Output entity
+   */
   GetById(id: number) {
     var url = `/apikey/entity/${id}`;
 
     return this._client.get<Output>(url);
   }
+  /**
+   * Retrieve the apikeys paged
+   * @param page the requested page
+   * @param pageSize the size of the page
+   * @param userId the userid we want to filter for
+   * Returns Paged result of ApiKey Output entity
+   */
   GetByUserId(page: number, pageSize: number, userId: string) {
     if (page < 1) throw "page needs to be greater than 0";
     if (pageSize < 1) throw "pageSize needs to be greater than 0";
@@ -31,18 +53,22 @@ export class ApiKey {
 
     return this._client.get<PagedResult<Output>>(url);
   }
+  /**
+   * Delete the ApiKey
+   * @param id The id
+   */
   Delete(id: number) {
     var url = "/apikey/entity/" + id;
 
-    this._client.delete(url);
+    return this._client.delete(url);
   }
 }
 type Input = {
   id: number;
-  eTag: string;
+  eTag?: string;
   usagePerDay?: number;
-  expiresAt: Date;
-  description: string;
+  expiresAt?: Date;
+  description?: string;
 };
 type Output = {
   id: number;

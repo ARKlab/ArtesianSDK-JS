@@ -6,15 +6,20 @@ export class SearchFacet {
   constructor(client: AxiosInstance) {
     this._client = client;
   }
+  /**
+   * Search the marketdata metadata
+   * @param filter ArtesianSearchFilter containing the search params
+   * Returns ArtesianSearchResults entity
+   */
   Search(filter: SearchFilter) {
     // todo validate
     const url =
-      "/marketdata/searchfacet?" +
-      `pageSize=${filter.pageSize}` +
-      `page=${filter.page}` +
-      `searchText=${filter.searchText}` +
-      `filters=${filtersToString(filter.filters)}` +
-      `sorts=${filter.sorts}`;
+      "/marketdata/searchfacet" +
+      `?page=${filter.page}` +
+      `&pageSize=${filter.pageSize}` +
+      `&searchText=${filter.searchText}` +
+      `&filters=${filtersToString(filter.filters)}` +
+      `&sorts=${filter.sorts}`;
 
     return this._client.get<SearchResults>(url);
   }
@@ -23,7 +28,7 @@ export class SearchFacet {
 type SearchFilter = {
   searchText: string;
   filters: Record<string, string[]>;
-  sorts: string[];
+  sorts?: string[];
   pageSize: number;
   page: number;
 };

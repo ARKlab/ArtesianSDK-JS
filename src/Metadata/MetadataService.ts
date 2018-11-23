@@ -29,11 +29,12 @@ class MetadataService {
   UpsertCurve: UpsertCurve;
 
   constructor(cfg: ArtesianServiceConfig) {
-    const { Get, Post, Delete, Put } = addAuthentication(cfg);
+    const { Get, Post, Delete, Put, Request } = addAuthentication(cfg);
     this.client = axios.create({ baseURL: cfg.baseUrl });
     this.client.get = Get;
     this.client.post = Post;
     this.client.delete = Delete;
+    this.client.request = Request;
     this.client.put = Put;
     this.Acl = new Acl(this.client);
     this.Admin = new Admin(this.client);
@@ -148,6 +149,14 @@ function addAuthentication(cfg: ArtesianServiceConfig) {
         .put<A>(`${cfg.baseUrl}/${MetadataVersion}/${url}`, data, {
           headers: header
         })
+        .then(x => x.data);
+    },
+    async Request(config: AxiosRequestConfig) {
+      const [newAuth, header] = await getHeaders(auth);
+      auth = newAuth;
+
+      return axios
+        .request({ ...config, url: `${cfg.baseUrl}/${MetadataVersion}/${config.url}`, headers: header })
         .then(x => x.data);
     }
   };
