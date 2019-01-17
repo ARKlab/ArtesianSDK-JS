@@ -12,7 +12,9 @@ export class ApiKey {
    * Returns ApiKey Output entity
    */
   Create(keyRecord: Input) {
-    //todo validate
+    if(keyRecord.id !=0){
+      throw new Error("Api Key must be 0")
+    }
     var url = "/apikey/entity";
 
     return this._client.post<Output>(url, keyRecord);
@@ -63,7 +65,7 @@ export class ApiKey {
     return this._client.delete(url);
   }
 }
-type Input = {
+export type Input = {
   id: number;
   eTag?: string;
   usagePerDay?: number;

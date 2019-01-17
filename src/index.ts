@@ -1,4 +1,4 @@
 import "es6-promise/auto";
-import * as QueryService from "./Query/QueryService";
-import * as MetadataService from "./Metadata/MetadataService";
-export { QueryService, MetadataService };
+import * as QueryService from "./Service/Query/QueryService";
+import * as MarketDataService from "./Service/MarketData/MarketDataService";
+export { QueryService, MarketDataService };

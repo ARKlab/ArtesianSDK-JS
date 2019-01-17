@@ -1,22 +1,23 @@
+import { MarketDataServiceExtensions } from './../../Factory/MarketDataServiceExtension';
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import {
   ArtesianServiceConfig,
   createApiKeyConfig,
   createAuthConfig,
   Auth0Config
-} from "../Data/ArtesianServiceConfig";
-import { MetadataVersion } from "../Data/Constants";
-import { Acl } from "./Acl";
-import { Admin } from "./Admin";
-import { ApiKey as ApiKeySdk } from "./ApiKey";
-import { CustomFilterSDK } from "./CustomFilter";
-import { MarketData } from "./MarketData";
-import { Operations } from "./Operations";
-import { SearchFacet } from "./SearchFacet";
-import { TimeTransformSDK } from "./TimeTransform";
-import { UpsertCurve } from "./UpsertCurve";
+} from "../../Data/ArtesianServiceConfig";
+import { MetadataVersion } from "../../Data/Constants";
+import { Acl } from "./MarketDataService.Acl";
+import { Admin } from "./MarketDataService.Admin";
+import { ApiKey as ApiKeySdk } from "./MarketDataService.ApiKey";
+import { CustomFilterSDK } from "./MarketDataService.CustomFilter";
+import { MarketData } from "./MarketDataService.MarketData";
+import { Operations } from "./MarketDataService.Operations";
+import { SearchFacet } from "./MarketDataService.SearchFacet";
+import { TimeTransformSDK } from "./MarketDataService.TimeTransform";
+import { UpsertCurve } from "./MarketDataService.UpsertCurve";
 
-class MetadataService {
+export  class MarketDataService {
   client: AxiosInstance;
   Acl: Acl;
   Admin: Admin;
@@ -27,6 +28,7 @@ class MetadataService {
   SearchFacet: SearchFacet;
   TimeTransform: TimeTransformSDK;
   UpsertCurve: UpsertCurve;
+  MarketDataServiceExtensions: MarketDataServiceExtensions;
 
   constructor(cfg: ArtesianServiceConfig) {
     const { Get, Post, Delete, Put, Request } = addAuthentication(cfg);
@@ -45,19 +47,21 @@ class MetadataService {
     this.SearchFacet = new SearchFacet(this.client);
     this.TimeTransform = new TimeTransformSDK(this.client);
     this.UpsertCurve = new UpsertCurve(this.client);
+    this.MarketDataServiceExtensions = new MarketDataServiceExtensions(this.client);
   }
 }
 /**
  * Create an instance of QueryService using apikey config
  * @param cfg Provide an api key and base url for the service
  */
+
 export function FromApiKey(cfg: { baseUrl: string; key: string }) {
   const queryConfig = cfg as Partial<{ baseUrl: string; key: string }>;
   if (typeof queryConfig.key == "undefined") throw "Must provide an api key";
   if (typeof queryConfig.baseUrl == "undefined")
     throw "Must provide a base Address to an Artesian tenant";
 
-  return new MetadataService(
+  return new MarketDataService(
     createApiKeyConfig({ baseUrl: queryConfig.baseUrl, key: queryConfig.key })
   );
 }
@@ -94,7 +98,7 @@ export function FromAuthConfig(cfg: {
   if (typeof queryConfig.clientSecret == "undefined")
     throw "Must provide an auth client secret";
 
-  return new MetadataService(
+  return new MarketDataService(
     createAuthConfig({
       baseUrl: queryConfig.baseUrl,
       audience: queryConfig.audience,
@@ -203,3 +207,4 @@ async function getHeaders(auth: Auth): Promise<[Auth, AuthHeaders]> {
 //   }
 //   getToken
 // }
+

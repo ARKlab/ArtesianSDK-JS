@@ -3,7 +3,7 @@ import {
   ArtesianServiceConfig,
   createApiKeyConfig,
   createAuthConfig
-} from "../Data/ArtesianServiceConfig";
+} from "../../Data/ArtesianServiceConfig";
 import { ActualQuery } from "./ActualQuery";
 import * as VQ from "./VersionedQuery";
 import { MasQuery } from "./MasQuery";
@@ -126,5 +126,5 @@ export function FromAuthConfig(cfg: {
 }
 
 export { RelativeIntervalType } from "./Data/Query";
-export { Granularity, SystemTimeTransform } from "../Data/Enums";
+export { Granularity, SystemTimeTransform } from "../../Data/Enums";
 export const VersionedQuery = VQ;

@@ -68,7 +68,7 @@ export class Admin {
     return this._client.get<Principals[]>(url);
   }
 }
-type AuthGroup = {
+export type AuthGroup = {
   id: number;
   eTag?: string;
   name: string;

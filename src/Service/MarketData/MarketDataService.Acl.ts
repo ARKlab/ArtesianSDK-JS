@@ -70,13 +70,11 @@ export class Acl {
    */
   RemoveRoles(upsert: AclPath) {
     var url = "/acl/roles";
-    //todo check delete body
-    //method returned as post in testing rather than delete
     return this._client.request<void>({ url, data: upsert, method: "delete" });
   }
 }
 
-type AclPath = {
+export type AclPath = {
   path: string;
   roles: AuthorizationPrincipalRole[];
 };
@@ -90,6 +88,9 @@ type Principal = {
   principalType: PrincipalType;
   principalId: string;
 };
+/**
+ * PrincipalType Enums
+ */
 export enum PrincipalType {
   Group,
   User

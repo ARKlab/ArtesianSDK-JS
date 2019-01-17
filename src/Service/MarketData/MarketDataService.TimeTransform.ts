@@ -1,5 +1,5 @@
 import { AxiosInstance } from "axios";
-import { TimeTransform } from "./Data/MarketData";
+import { TimeTransform } from "./Data/MarketDataEntity";
 import { PagedResult } from "./Data/Response";
 
 export class TimeTransformSDK {

@@ -1,4 +1,4 @@
-import { Granularity } from "../../Data/Enums";
+import { Granularity } from "../../../Data/Enums";
 
 export type QueryParams = {
   extractionRange: ExtractionRange;

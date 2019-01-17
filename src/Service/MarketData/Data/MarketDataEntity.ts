@@ -1,7 +1,9 @@
-import { Granularity } from "../../Data/Enums";
-
+import { Granularity } from "../../../Data/Enums";
+/**
+ * The ApiKey Entity Input
+ */
 export type Input = {
-  marketDataId: number;
+  marketDataId?: number;
   eTag?: string;
   providerName: string;
   marketDataName: string;
@@ -14,6 +16,9 @@ export type Input = {
   tags?: Record<string, string[]>;
   path?: string;
 };
+/**
+ * The ApiKey Entity Output
+ */
 export type Output = Input & {
   transform: TimeTransform;
   lastUpdated: Date;
@@ -22,7 +27,9 @@ export type Output = Input & {
   dateRangeEnd?: Date;
   created: Date;
 };
-
+/**
+ * The TimeTransform base entity with Etag
+ */
 export type TimeTransform = {
   id: number;
   name: string;
@@ -30,22 +37,32 @@ export type TimeTransform = {
   definedBy: TransformDefinitionType;
   type: TransformType;
 };
-
+/**
+ * MarketDataType Enums
+ */
 export enum MarketDataType {
   ActualTimeSerie,
   VersionedTimeSerie,
   MarketAssessment
 }
+/**
+ * Aggregation Rule Enums
+ */
 export enum AggregationRule {
   Undefined,
   SumAndDivide,
   AverageAndReplicate
 }
-
+/**
+ * TransformDefinitionType Enums
+ */
 export enum TransformDefinitionType {
   User,
   System
 }
+/**
+ * TransformType Enums
+ */
 export enum TransformType {
   SimpleShift,
   Calendar,

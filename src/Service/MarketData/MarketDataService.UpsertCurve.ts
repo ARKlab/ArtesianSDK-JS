@@ -1,5 +1,7 @@
+import { validateUpsertCurveData } from './../../Common/validators';
+import { MarketAssessmentValue } from './MarketDataService.UpsertCurve';
 import { AxiosInstance } from "axios";
-import { MarketDataIdentifier } from "./MarketData";
+import { MarketDataIdentifier } from "./MarketDataService.MarketData";
 
 export class UpsertCurve {
   _client: AxiosInstance;
@@ -17,25 +19,27 @@ export class UpsertCurve {
    * @param data An object that rappresent MarketDataAssessment, ActualTimeSerie or VersionedTimeSerie
    */
   UpsertCurevData(data: UpsertCurveData) {
-    //todo validate
+
+    validateUpsertCurveData(data)
+
     const url = "/marketdata/upsertdata";
 
     return this._client.post(url, data);
   }
 }
-type UpsertCurveData = {
+
+export type UpsertCurveData = {
   id: MarketDataIdentifier;
   version?: Date;
   timezone: string;
   downloadedAt: Date;
-  marketAssessment?: Record<DateString, Record<string, MarketAssessmentValue>>;
-  rows?: Record<DateString, number>;
+  marketAssessment?: Record<string, Record<string,MarketAssessmentValue>>;
+  rows?: Map<Date,number | undefined>;
   deferCommandExecution?: boolean;
   deferDataGeneration?: boolean;
 };
 
-
-type MarketAssessmentValue = {
+export type MarketAssessmentValue = {
   settlement?: number;
   open?: number;
   close?: number;
@@ -46,4 +50,3 @@ type MarketAssessmentValue = {
   volume?: number;
 };
 
-type DateString = string;

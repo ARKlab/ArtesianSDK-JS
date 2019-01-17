@@ -1,3 +1,4 @@
+import { validateCustomFilter } from './../../Common/validators';
 import { AxiosInstance } from "axios";
 import { PagedResult } from "./Data/Response";
 
@@ -12,7 +13,7 @@ export class CustomFilterSDK {
    * Returns Custom Filter Entity
    */
   Create(filter: CustomFilter) {
-    //todo validate
+    validateCustomFilter(filter);
     var url = "/filter";
 
     return this._client.post<CustomFilter>(url, filter);
@@ -24,7 +25,7 @@ export class CustomFilterSDK {
    * Returns Custom Filter Entity
    */
   Update(filterId: number, filter: CustomFilter) {
-    //todo validate
+    validateCustomFilter(filter);
     var url = "/filter/" + filterId;
 
     return this._client.put<CustomFilter>(url, filter);
@@ -35,7 +36,6 @@ export class CustomFilterSDK {
    * Returns Custom Filter Entity
    */
   GetById(filterId: number) {
-    //todo validate
     var url = "/filter/" + filterId;
 
     return this._client.get<CustomFilter>(url);
@@ -46,7 +46,6 @@ export class CustomFilterSDK {
    * Returns Custom Filter Entity
    */
   Delete(filterId: number) {
-    //todo validate
     var url = "/filter/" + filterId;
 
     return this._client.delete(url);
@@ -58,13 +57,15 @@ export class CustomFilterSDK {
    * Returns Paged Result of Custom Filter Entity
    */
   Get(page: number, pageSize: number) {
-    //todo validate
+    if (page < 1 || pageSize < 1){
+        throw new Error("Page and Page number need to be greater than 0. Page:" + page + " Page Size:" + pageSize);
+    }
     var url = "/filter?" + [`page=${page}` + `pageSize=${pageSize}`].join("&");
 
     return this._client.get<PagedResult<CustomFilter>>(url);
   }
 }
-type CustomFilter = {
+export type CustomFilter = {
   id: number;
   name: string;
   searchText: string;

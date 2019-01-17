@@ -1,5 +1,6 @@
+import { validateSearchFilter } from './../../Common/validators';
 import { AxiosInstance } from "axios";
-import { Output } from "./Data/MarketData";
+import { Output } from "./Data/MarketDataEntity";
 
 export class SearchFacet {
   _client: AxiosInstance;
@@ -12,7 +13,7 @@ export class SearchFacet {
    * Returns ArtesianSearchResults entity
    */
   Search(filter: SearchFilter) {
-    // todo validate
+    validateSearchFilter(filter);
     const url =
       "/marketdata/searchfacet" +
       `?page=${filter.page}` +
@@ -25,7 +26,7 @@ export class SearchFacet {
   }
 }
 
-type SearchFilter = {
+export type SearchFilter = {
   searchText: string;
   filters: Record<string, string[]>;
   sorts?: string[];

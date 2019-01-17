@@ -5,7 +5,7 @@ import {
   addTimeTransformQueryParam
 } from "./Data/Query";
 import { ActualRow, InternalActualRow, actualMapper } from "./Data/Response";
-import { Granularity } from "../Data/Enums";
+import { Granularity } from "../../Data/Enums";
 
 function validateGranularity(
   q: Partial<ActualQueryParams>

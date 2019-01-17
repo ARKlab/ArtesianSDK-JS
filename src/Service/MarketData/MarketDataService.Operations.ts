@@ -1,5 +1,5 @@
 import { AxiosInstance } from "axios";
-import { Output } from "./Data/MarketData";
+import { Output } from "./Data/MarketDataEntity";
 
 export class Operations {
   _client: AxiosInstance;

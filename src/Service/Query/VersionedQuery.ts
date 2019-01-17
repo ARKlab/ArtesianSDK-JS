@@ -14,7 +14,7 @@ import {
   versionedMapper,
   VersionedRow
 } from "./Data/Response";
-import { Granularity } from "../Data/Enums";
+import { Granularity } from "../../Data/Enums";
 
 export class VersionedQuery extends Q.Query {
   _queryParams: Partial<VersionedQueryParams>;

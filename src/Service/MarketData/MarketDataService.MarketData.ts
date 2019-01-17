@@ -1,6 +1,7 @@
 import { AxiosInstance } from "axios";
 import { PagedResult } from "./Data/Response";
-import { Output, Input } from "./Data/MarketData";
+import { Output, Input } from "./Data/MarketDataEntity";
+import { isValidProvider, isValidMarketDataName, validateRegisterMarketDataEntity, validateUpdateMarketDataEntity } from "../../Common/validators";
 
 export class MarketData {
   _client: AxiosInstance;
@@ -13,7 +14,7 @@ export class MarketData {
    * Returns MarketData Entity Output
    */
   ReadMarketDataRegistry(id: MarketDataIdentifier) {
-    //todo validate
+    validate(id);
     var url = `/marketdata/entity?provider=${id.provider}&curveName=${id.name}`;
     return this._client.get<Output>(url);
   }
@@ -23,7 +24,9 @@ export class MarketData {
    * Returns MarketData Entity Output
    */
   ReadMarketDataRegistryById(id: number) {
-    //todo validate
+    if (id < 1)
+      throw new Error("Id invalid :" + id);
+
     var url = "/marketdata/entity/" + id;
     return this._client.get<Output>(url);
   }
@@ -57,7 +60,8 @@ export class MarketData {
    * Returns MarketData Entity Output
    */
   RegisterMarketData(metadata: Input) {
-    //todo validate
+    validateRegisterMarketDataEntity(metadata);
+
     const url = "/marketdata/entity";
 
     return this._client.post<Output>(url, metadata);
@@ -68,7 +72,7 @@ export class MarketData {
    * Returns MarketData Entity Output
    */
   UpdateMarketData(metadata: Input) {
-    //todo validate
+    validateUpdateMarketDataEntity(metadata);
     const url = "marketdata/entity/" + metadata.marketDataId;
 
     return this._client.put<Output>(url, metadata);
@@ -83,6 +87,7 @@ export class MarketData {
     return this._client.delete(url);
   }
 }
+
 export type MarketDataIdentifier = {
   provider: string;
   name: string;
@@ -103,4 +108,9 @@ function ObjectToQueryString(obj: any) {
     .filter(([_, v]) => Boolean(v))
     .map(x => x.join("="))
     .join("&");
+}
+
+function validate(marketDataIdentifier: MarketDataIdentifier){
+  isValidProvider(marketDataIdentifier.provider,1,50)
+  isValidMarketDataName(marketDataIdentifier.name,1,250)
 }
