@@ -169,6 +169,8 @@ export const validateUpsertCurveData = (upsertCurveData:UpsertCurveData) => {
         if(upsertCurveData.marketAssessment == null || countMarketAssessments(upsertCurveData.marketAssessment) == 0){
             throw new Error("UpsertCurveData Rows must be valorized if MarketAssessment is null");
         }
+    }
+    else{
 
         if(upsertCurveData.marketAssessment != null && upsertCurveData.rows != null){
             throw new Error("UpsertCurveData MarketAssessment must be valorized if Rows are null")
@@ -186,6 +188,18 @@ export const validateUpsertCurveData = (upsertCurveData:UpsertCurveData) => {
         else{
             if(upsertCurveData.marketAssessment != null){
                 throw new Error("UpsertCurveData MarketAssessment must be NULL if Rows are Valorized")
+            }
+
+            if(upsertCurveData.rows != undefined){
+                var iterator = upsertCurveData.rows.keys();
+
+                while(iterator.next().done != true){
+                    
+                    if(iterator.next().value == new Date()){
+                        throw new Error("Invalid timepoint")
+                    }
+
+                }
             }
 
             // foreach (var row in upsertCurveData.Rows)
