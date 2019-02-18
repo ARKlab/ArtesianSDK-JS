@@ -3,11 +3,11 @@ import {
   ArtesianServiceConfig,
   createApiKeyConfig,
   createAuthConfig
-} from "./Data/ArtesianServiceConfig";
+} from "../../Data/ArtesianServiceConfig";
 import { ActualQuery } from "./ActualQuery";
 import * as VQ from "./VersionedQuery";
 import { MasQuery } from "./MasQuery";
-import { QueryRoute, QueryVersion } from "./Data/ArtesianConstants";
+import { QueryRoute, QueryVersion } from "./Data/Constants";
 
 class QueryService {
   client: AxiosInstance;
@@ -125,10 +125,6 @@ export function FromAuthConfig(cfg: {
   );
 }
 
-export {
-  Granularity,
-  RelativeIntervalType,
-  SystemTimeTransform
-} from "./Data/Query";
-
+export { RelativeIntervalType } from "./Data/Query";
+export { Granularity, SystemTimeTransform } from "../../Data/Enums";
 export const VersionedQuery = VQ;

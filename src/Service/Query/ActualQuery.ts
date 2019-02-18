@@ -1,11 +1,11 @@
 import * as Q from "./Query";
 import {
   ActualQueryParams,
-  Granularity,
   getCurveSelectionParams,
   addTimeTransformQueryParam
 } from "./Data/Query";
 import { ActualRow, InternalActualRow, actualMapper } from "./Data/Response";
+import { Granularity } from "../../Data/Enums";
 
 function validateGranularity(
   q: Partial<ActualQueryParams>

@@ -2,7 +2,6 @@ import * as Q from "./Query";
 import {
   VersionedQueryParams,
   VersionSelectionType,
-  Granularity,
   getCurveSelectionParams,
   addTimeTransformQueryParam,
   LastOfType,
@@ -15,6 +14,7 @@ import {
   versionedMapper,
   VersionedRow
 } from "./Data/Response";
+import { Granularity } from "../../Data/Enums";
 
 export class VersionedQuery extends Q.Query {
   _queryParams: Partial<VersionedQueryParams>;

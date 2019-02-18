@@ -4,7 +4,7 @@
     "outDir": "../dist",
     "module": "commonjs",
     "target": "es5",
-    "lib": ["dom", "es2015.promise", "scripthost", "es5"],
+    "lib": ["dom", "es2015.promise", "scripthost", "es5", "es6"],
     "moduleResolution": "node",
     "sourceMap": true,
     "inlineSourceMap": false

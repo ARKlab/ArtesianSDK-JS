@@ -1,3 +1,5 @@
+import { Granularity } from "../../../Data/Enums";
+
 export type QueryParams = {
   extractionRange: ExtractionRange;
   curveSelection: CurveSelection;
@@ -105,20 +107,4 @@ export enum RelativeIntervalType {
   MonthToDate,
   QuarterToDate,
   YearToDate
-}
-export enum Granularity {
-  Hour,
-  Day,
-  Week,
-  Month,
-  Quarter,
-  Year,
-  TenMinute,
-  FifteenMinute,
-  Minute,
-  ThirtyMinute
-}
-export enum SystemTimeTransform {
-  GASDAY66 = 1,
-  THERMALYEAR = 2
 }
