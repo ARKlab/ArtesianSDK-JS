@@ -1,3 +1,4 @@
+import * as R from "ramda";
 import { ArtesianServiceConfig } from "../Data/ArtesianServiceConfig";
 import axios, { AxiosRequestConfig } from "axios";
 import { CreateWrapper } from "./ApiResilienceStrategy";
@@ -13,10 +14,17 @@ export function axiosWrapper(
     const headers = await getHeaders();
 
     return axios
-      .request<A>({
-        ...config,
-        ...headers
-      })
+      .request<A>(
+        R.mergeDeepRight(
+          {
+            headers: { "user-agent": "ArtesianSDK-JS v0.0.6" }
+          },
+          {
+            ...config,
+            ...headers
+          }
+        )
+      )
       .then(x => x.data);
   }
   return wrapper(Request);
