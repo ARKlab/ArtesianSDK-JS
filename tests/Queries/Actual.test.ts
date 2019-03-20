@@ -84,4 +84,37 @@ describe("ActualQueries", () => {
           });
         }));
   });
+  test("Partitions Queries - 1", async () => {
+    const qs = QueryService.FromApiKey({
+      baseUrl: "lel",
+      key: "hehe",
+      queryOptions: { partitionSize: 1 }
+    });
+
+    await qs
+      .CreateActual()
+      .ForMarketData([100000001, 100])
+      .InGranularity(Granularity.Day)
+      .InAbsoluteDateRange(new Date("2018-1-1"), new Date("2018-1-10"))
+      .WithTimeTransform(SystemTimeTransform.THERMALYEAR)
+      .Execute();
+
+    expect(moxios.requests.count()).toEqual(2);
+  });
+  test("Partitions Queries - 2", async () => {
+    const qs = QueryService.FromApiKey({
+      baseUrl: "lel",
+      key: "hehe",
+      queryOptions: { partitionSize: 2 }
+    });
+
+    await qs
+      .CreateActual()
+      .ForMarketData([100000001, 100, 101])
+      .InGranularity(Granularity.Day)
+      .InAbsoluteDateRange(new Date("2018-1-1"), new Date("2018-1-10"))
+      .WithTimeTransform(SystemTimeTransform.THERMALYEAR)
+      .Execute();
+    expect(moxios.requests.count()).toEqual(2);
+  });
 });

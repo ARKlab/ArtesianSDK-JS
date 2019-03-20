@@ -1,84 +1,81 @@
-import axios, { AxiosInstance, AxiosPromise } from "axios";
 import {
   ArtesianServiceConfig,
   createApiKeyConfig,
-  createAuthConfig
+  createAuthConfig,
+  queryOptions
 } from "../../Data/ArtesianServiceConfig";
 import { ActualQuery } from "./ActualQuery";
 import * as VQ from "./VersionedQuery";
 import { MasQuery } from "./MasQuery";
 import { QueryRoute, QueryVersion } from "./Data/Constants";
+import { CircuitBreakerOptions } from "../../Common/CircuitBreaker";
+import { RetryOptions } from "../../Common/Retry";
+import { BulkheadOptions } from "../../Common/Bulkhead";
+import { axiosWrapper } from "../../Common/AxiosWrapper";
+import { IdPartitionStrategy } from "./Partition/IdPartitionStrategy";
 
+export interface IService {
+  get: <a>(url: string) => Promise<a>;
+}
 class QueryService {
-  client: AxiosInstance;
-  constructor(cfg: ArtesianServiceConfig) {
-    function Get<A>(url: string): AxiosPromise<A> {
-      switch (cfg.authType.tag) {
-        case "ApiKeyConfig":
-          return axios.get<A>(
-            `${cfg.baseUrl}/${QueryRoute}/${QueryVersion}/${url}`,
-            {
-              headers: { "x-api-key": cfg.authType.val }
-            }
-          );
-        case "Auth0Config":
-          return axios
-            .post(
-              `https://${cfg.authType.domain}/oauth/token`,
-              {
-                client_id: cfg.authType.clientId,
-                client_secret: cfg.authType.clientSecret,
-                audience: cfg.authType.audience,
-                grant_type: "client_credentials"
-              },
-              { headers: { "content-type": "application/json" } }
-            )
-            .then((res: { data: any }) => res.data)
-            .then((data: { access_token: string }) => data.access_token)
-            .then((token: string) =>
-              axios.get<A>(
-                `${cfg.baseUrl}/${QueryRoute}/${QueryVersion}/${url}`,
-                {
-                  headers: { Authorization: `Bearer ${token}` }
-                }
-              )
-            );
-      }
+  client: IService;
+  constructor(private cfg: ArtesianServiceConfig) {
+    const requester = axiosWrapper(cfg);
+    function Get<A>(url: string): Promise<A> {
+      return requester({
+        url: `${cfg.baseUrl}/${QueryRoute}/${QueryVersion}/${url}`
+      });
     }
-    this.client = axios.create({ baseURL: cfg.baseUrl });
-    this.client.get = Get;
+
+    this.client = {
+      get: Get
+    };
   }
   /**
    * Create Actual Time Serie Query
    */
   CreateActual() {
-    return new ActualQuery(this.client);
+    return new ActualQuery(this.client, IdPartitionStrategy(this.cfg));
   }
   /**
    * Create Versioned Time Serie Query
    */
   CreateVersioned() {
-    return new VQ.VersionedQuery(this.client);
+    return new VQ.VersionedQuery(this.client, IdPartitionStrategy(this.cfg));
   }
   /**
    * Create Market Assessment Time Serie Query
    */
   CreateMas() {
-    return new MasQuery(this.client);
+    return new MasQuery(this.client, IdPartitionStrategy(this.cfg));
   }
 }
 /**
  * Create an instance of QueryService using apikey config
  * @param cfg Provide an api key and base url for the service
  */
-export function FromApiKey(cfg: { baseUrl: string; key: string }) {
+export function FromApiKey(cfg: {
+  baseUrl: string;
+  key: string;
+  queryOptions?: queryOptions;
+  retryOptions?: RetryOptions;
+  bulkheadOptions?: BulkheadOptions;
+  circuitBreakerOptions?: CircuitBreakerOptions;
+}) {
   const queryConfig = cfg as Partial<{ baseUrl: string; key: string }>;
   if (typeof queryConfig.key == "undefined") throw "Must provide an api key";
   if (typeof queryConfig.baseUrl == "undefined")
     throw "Must provide a base Address to an Artesian tenant";
 
   return new QueryService(
-    createApiKeyConfig({ baseUrl: queryConfig.baseUrl, key: queryConfig.key })
+    createApiKeyConfig({
+      baseUrl: queryConfig.baseUrl,
+      key: queryConfig.key,
+      queryOptions: cfg.queryOptions,
+      retryOptions: cfg.retryOptions,
+      circuitBreakerOptions: cfg.circuitBreakerOptions,
+      bulkheadOptions: cfg.bulkheadOptions
+    })
   );
 }
 /**
@@ -91,6 +88,10 @@ export function FromAuthConfig(cfg: {
   domain: string;
   clientId: string;
   clientSecret: string;
+  queryOptions?: queryOptions;
+  retryOptions?: RetryOptions;
+  bulkheadOptions?: BulkheadOptions;
+  circuitBreakerOptions?: CircuitBreakerOptions;
 }) {
   const queryConfig = cfg as Partial<{
     baseUrl: string;
@@ -120,7 +121,11 @@ export function FromAuthConfig(cfg: {
       audience: queryConfig.audience,
       domain: queryConfig.domain,
       clientId: queryConfig.clientId,
-      clientSecret: queryConfig.clientSecret
+      clientSecret: queryConfig.clientSecret,
+      queryOptions: cfg.queryOptions,
+      retryOptions: cfg.retryOptions,
+      circuitBreakerOptions: cfg.circuitBreakerOptions,
+      bulkheadOptions: cfg.bulkheadOptions
     })
   );
 }

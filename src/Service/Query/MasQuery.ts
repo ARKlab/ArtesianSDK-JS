@@ -1,3 +1,4 @@
+import * as R from "ramda";
 import * as Q from "./Query";
 import { MasQueryParams, getCurveSelectionParams } from "./Data/Query";
 import { MasRow, InternalMasRow, masMapper } from "./Data/Response";
@@ -16,19 +17,22 @@ export class MasQuery extends Q.Query {
    * Execute the query
    */
   Execute(): Promise<MasRow[]> {
-    return buildUrl(this._queryParams)
-      .then(url => this.client.get<InternalMasRow[]>(url))
-      .then(res => res.data.map(masMapper));
+    return validateQuery(this._queryParams)
+      .then(R.of)
+      .then(this.partitionStrategy)
+      .then(R.map(buildUrl))
+      .then(R.map(url => this.client.get<InternalMasRow>(url)))
+      .then(x => Promise.all(x))
+      .then(R.unnest)
+      .then(R.map(masMapper));
   }
 }
+
 function validateQuery(q: Partial<MasQueryParams>): Promise<MasQueryParams> {
   return Q.validateQuery(q).then(() => validateProducts(q));
 }
-function buildUrl(q: Partial<MasQueryParams>): Promise<string> {
-  return validateQuery(q).then(
-    q =>
-      "mas/" + `${Q.buildExtractionRangeRoute(q)}` + `?${getUrlQueryParams(q)}`
-  );
+function buildUrl(q: MasQueryParams): string {
+  return `mas/${Q.buildExtractionRangeRoute(q)}?${getUrlQueryParams(q)}`;
 }
 function getUrlQueryParams(q: MasQueryParams): string {
   return [

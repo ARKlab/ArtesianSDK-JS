@@ -24,3 +24,7 @@ export function qsToObj(qs: String) {
     .map(q => q.split("="))
     .reduce((obj, [key, val]) => ({ ...obj, [key]: val }), {});
 }
+
+export function timer(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
