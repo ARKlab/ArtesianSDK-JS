@@ -1,11 +1,28 @@
 import * as R from "ramda";
-import { QueryParams, CurveSelectionType } from "../Data/Query";
+import {
+  QueryParams,
+  CurveSelectionType,
+  ActualQueryParams,
+  VersionedQueryParams,
+  MasQueryParams
+} from "../Data/Query";
 import { partitionIds } from "../../../Common/ArtesianUtils";
 import { queryOptions } from "../../../Data/ArtesianServiceConfig";
 
-export const IdPartitionStrategy = <Params extends QueryParams>(cfg: {
+export interface IPartitionStrategy {
+  Actual: (a: ActualQueryParams[]) => ActualQueryParams[];
+  Versioned: (a: VersionedQueryParams[]) => VersionedQueryParams[];
+  Mas: (a: MasQueryParams[]) => MasQueryParams[];
+}
+export function IdPartitionStrategy(cfg: {
   queryOptions?: queryOptions;
-}) => R.chain<Params, Params>(expandParams(cfg));
+}): IPartitionStrategy {
+  return {
+    Actual: R.chain(expandParams(cfg)),
+    Versioned: R.chain(expandParams(cfg)),
+    Mas: R.chain(expandParams(cfg))
+  };
+}
 
 const expandParams = <Params extends QueryParams>(cfg: {
   queryOptions?: queryOptions;

@@ -5,14 +5,13 @@ import {
   RelativeIntervalType
 } from "./Data/Query";
 import { IService } from "./QueryService";
+import { IPartitionStrategy } from "./Partition/IdPartitionStrategy";
 
 export class Query {
   _queryParams: Partial<QueryParams> = {};
   constructor(
     public client: IService,
-    public partitionStrategy: <Params extends QueryParams>(
-      q: Params[]
-    ) => Params[]
+    public partitionStrategy: IPartitionStrategy
   ) {}
   /**
    * Set the market ids to be queried

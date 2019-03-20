@@ -40,7 +40,7 @@ export class ActualQuery extends Q.Query {
   Execute(): Promise<ActualRow[]> {
     return validateQuery(this._queryParams)
       .then(R.of)
-      .then(this.partitionStrategy)
+      .then(this.partitionStrategy.Actual)
       .then(R.map(buildUrl))
       .then(R.map(url => this.client.get<InternalActualRow>(url)))
       .then(x => Promise.all(x))

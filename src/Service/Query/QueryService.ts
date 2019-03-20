@@ -12,7 +12,10 @@ import { CircuitBreakerOptions } from "../../Common/CircuitBreaker";
 import { RetryOptions } from "../../Common/Retry";
 import { BulkheadOptions } from "../../Common/Bulkhead";
 import { axiosWrapper } from "../../Common/AxiosWrapper";
-import { IdPartitionStrategy } from "./Partition/IdPartitionStrategy";
+import {
+  IdPartitionStrategy,
+  IPartitionStrategy
+} from "./Partition/IdPartitionStrategy";
 
 export interface IService {
   get: <a>(url: string) => Promise<a>;
@@ -34,20 +37,22 @@ class QueryService {
   /**
    * Create Actual Time Serie Query
    */
-  CreateActual() {
-    return new ActualQuery(this.client, IdPartitionStrategy(this.cfg));
+  CreateActual(strategy: IPartitionStrategy = IdPartitionStrategy(this.cfg)) {
+    return new ActualQuery(this.client, strategy);
   }
   /**
    * Create Versioned Time Serie Query
    */
-  CreateVersioned() {
-    return new VQ.VersionedQuery(this.client, IdPartitionStrategy(this.cfg));
+  CreateVersioned(
+    strategy: IPartitionStrategy = IdPartitionStrategy(this.cfg)
+  ) {
+    return new VQ.VersionedQuery(this.client, strategy);
   }
   /**
    * Create Market Assessment Time Serie Query
    */
-  CreateMas() {
-    return new MasQuery(this.client, IdPartitionStrategy(this.cfg));
+  CreateMas(strategy: IPartitionStrategy = IdPartitionStrategy(this.cfg)) {
+    return new MasQuery(this.client, strategy);
   }
 }
 /**

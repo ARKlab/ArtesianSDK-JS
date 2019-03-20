@@ -104,7 +104,7 @@ export class VersionedQuery extends Q.Query {
   Execute(): Promise<VersionedRow[]> {
     return validateQuery(this._queryParams)
       .then(R.of)
-      .then(this.partitionStrategy)
+      .then(this.partitionStrategy.Versioned)
       .then(R.map(buildUrl))
       .then(R.map(url => this.client.get<InternalVersionedRow>(url)))
       .then(x => Promise.all(x))

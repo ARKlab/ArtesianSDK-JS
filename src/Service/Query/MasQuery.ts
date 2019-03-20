@@ -19,7 +19,7 @@ export class MasQuery extends Q.Query {
   Execute(): Promise<MasRow[]> {
     return validateQuery(this._queryParams)
       .then(R.of)
-      .then(this.partitionStrategy)
+      .then(this.partitionStrategy.Mas)
       .then(R.map(buildUrl))
       .then(R.map(url => this.client.get<InternalMasRow>(url)))
       .then(x => Promise.all(x))
