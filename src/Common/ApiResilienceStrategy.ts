@@ -7,7 +7,7 @@ import {
 } from "./CircuitBreaker";
 import { Retry, defaultRetryOptions, RetryOptions } from "./Retry";
 
-type requester = <Request, Response>(r: Request) => Promise<Response>;
+export type requester = <Request, Response>(r: Request) => Promise<Response>;
 export function CreateWrapper(cfg: {
   bulkheadOptions?: BulkheadOptions;
   circuitBreakerOptions?: CircuitBreakerOptions;

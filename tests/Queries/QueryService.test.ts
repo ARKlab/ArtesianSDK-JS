@@ -115,4 +115,25 @@ describe("QueryService", () => {
   test("Has Bulkhead", () => {
     // todo test bulkhead is used
   });
+  test("Allow User to specify an execution strategy", async () => {
+    moxios.uninstall();
+    moxios.install();
+    moxios.stubRequest(/.*/, {
+      status: 422,
+      statusText: "no good",
+      response: { message: "lel" }
+    });
+
+    const qs = QueryService.FromApiKey({
+      baseUrl: "fake",
+      key: "lulz",
+      executionStrategy: x => x
+    });
+    await expect(
+      qs.client.get("fake").catch(x => {
+        throw x.response.statusText;
+      })
+    ).rejects.toEqual("no good");
+    expect(moxios.requests.count()).toEqual(1);
+  });
 });

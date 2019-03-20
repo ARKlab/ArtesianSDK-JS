@@ -1,6 +1,7 @@
 import { RetryOptions } from "../Common/Retry";
 import { CircuitBreakerOptions } from "../Common/CircuitBreaker";
 import { BulkheadOptions } from "../Common/Bulkhead";
+import { requester } from "../Common/ApiResilienceStrategy";
 
 export type ArtesianServiceConfig = {
   baseUrl: string;
@@ -8,6 +9,7 @@ export type ArtesianServiceConfig = {
   retryOptions?: RetryOptions;
   circuitBreakerOptions?: CircuitBreakerOptions;
   bulkheadOptions?: BulkheadOptions;
+  executionStrategy?: (r: requester) => requester;
   authType: ApiKeyConfig | Auth0Config;
 };
 
@@ -18,14 +20,16 @@ export function createApiKeyConfig(cfg: {
   retryOptions?: RetryOptions;
   circuitBreakerOptions?: CircuitBreakerOptions;
   bulkheadOptions?: BulkheadOptions;
+  executionStrategy?: (r: requester) => requester;
 }): ArtesianServiceConfig {
   return {
+    baseUrl: cfg.baseUrl,
+    authType: { tag: "ApiKeyConfig", val: cfg.key },
     queryOptions: cfg.queryOptions,
     retryOptions: cfg.retryOptions,
     circuitBreakerOptions: cfg.circuitBreakerOptions,
     bulkheadOptions: cfg.bulkheadOptions,
-    baseUrl: cfg.baseUrl,
-    authType: { tag: "ApiKeyConfig", val: cfg.key }
+    executionStrategy: cfg.executionStrategy
   };
 }
 export function createAuthConfig(cfg: {
@@ -38,6 +42,7 @@ export function createAuthConfig(cfg: {
   retryOptions?: RetryOptions;
   circuitBreakerOptions?: CircuitBreakerOptions;
   bulkheadOptions?: BulkheadOptions;
+  executionStrategy?: (r: requester) => requester;
 }): ArtesianServiceConfig {
   return {
     baseUrl: cfg.baseUrl,
@@ -51,7 +56,8 @@ export function createAuthConfig(cfg: {
     queryOptions: cfg.queryOptions,
     retryOptions: cfg.retryOptions,
     circuitBreakerOptions: cfg.circuitBreakerOptions,
-    bulkheadOptions: cfg.bulkheadOptions
+    bulkheadOptions: cfg.bulkheadOptions,
+    executionStrategy: cfg.executionStrategy
   };
 }
 export type ApiKeyConfig = {

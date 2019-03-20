@@ -16,6 +16,7 @@ import {
   IdPartitionStrategy,
   IPartitionStrategy
 } from "./Partition/IdPartitionStrategy";
+import { requester } from "../../Common/ApiResilienceStrategy";
 
 export interface IService {
   get: <a>(url: string) => Promise<a>;
@@ -66,6 +67,7 @@ export function FromApiKey(cfg: {
   retryOptions?: RetryOptions;
   bulkheadOptions?: BulkheadOptions;
   circuitBreakerOptions?: CircuitBreakerOptions;
+  executionStrategy?: (r: requester) => requester;
 }) {
   const queryConfig = cfg as Partial<{ baseUrl: string; key: string }>;
   if (typeof queryConfig.key == "undefined") throw "Must provide an api key";
@@ -78,8 +80,9 @@ export function FromApiKey(cfg: {
       key: queryConfig.key,
       queryOptions: cfg.queryOptions,
       retryOptions: cfg.retryOptions,
+      bulkheadOptions: cfg.bulkheadOptions,
       circuitBreakerOptions: cfg.circuitBreakerOptions,
-      bulkheadOptions: cfg.bulkheadOptions
+      executionStrategy: cfg.executionStrategy
     })
   );
 }
@@ -97,6 +100,7 @@ export function FromAuthConfig(cfg: {
   retryOptions?: RetryOptions;
   bulkheadOptions?: BulkheadOptions;
   circuitBreakerOptions?: CircuitBreakerOptions;
+  executionStrategy?: (r: requester) => requester;
 }) {
   const queryConfig = cfg as Partial<{
     baseUrl: string;
@@ -130,7 +134,8 @@ export function FromAuthConfig(cfg: {
       queryOptions: cfg.queryOptions,
       retryOptions: cfg.retryOptions,
       circuitBreakerOptions: cfg.circuitBreakerOptions,
-      bulkheadOptions: cfg.bulkheadOptions
+      bulkheadOptions: cfg.bulkheadOptions,
+      executionStrategy: cfg.executionStrategy
     })
   );
 }

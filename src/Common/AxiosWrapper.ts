@@ -7,8 +7,7 @@ import { Auth0Cache } from "./Auth0Cache";
 export function axiosWrapper(
   cfg: ArtesianServiceConfig
 ): <A>(r: AxiosRequestConfig) => Promise<A> {
-  const wrapper = CreateWrapper(cfg);
-
+  const wrapper = cfg.executionStrategy || CreateWrapper(cfg);
   const getHeaders = GetHeaders(cfg);
   async function Request<A>(config: AxiosRequestConfig) {
     const headers = await getHeaders();
