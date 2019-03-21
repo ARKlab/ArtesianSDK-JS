@@ -256,6 +256,39 @@ QueryService.FromAuthConfig({
 });
 ```
 
+### Custom Query Partition Strategy
+
+It is possible to define your own custom partition strategy it must subscibe to the interface `IPartitionStrategy` and can be configured with an optional configuration field `paritionStrategy`
+
+```typescript
+interface IPartitionStrategy {
+  Actual: (a: ActualQueryParams[]) => ActualQueryParams[];
+  Versioned: (a: VersionedQueryParams[]) => VersionedQueryParams[];
+  Mas: (a: MasQueryParams[]) => MasQueryParams[];
+}
+
+const doNothingStrategy = {
+  Actual: x => x,
+  Versioned: x => x,
+  Mas: x => x
+};
+
+const qs = QueryService.FromApiKey({
+  baseUrl: string,
+  key: string,
+  paritionStrategy: doNothingStrategy
+});
+
+QueryService.FromAuthConfig({
+  baseUrl: "https://fake-artesian-env/",
+  audience: "audience",
+  domain: "domain",
+  clientId: "client_id",
+  clientSecret: "client_secret",
+  paritionStrategy: doNothingStrategy
+});
+```
+
 ### Retry Request Execution Strategy
 
 Sometimes requests will fail spontaneously but will work if simply executed again in a few moments. In order to reduce these kinds of errors in the sdk there is a built in retry strategy. The request will retry 3 times with an increasing length of time between requests. The retry strategy can be configured with an optional configuration field `retryOptions`

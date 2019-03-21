@@ -12,10 +12,7 @@ import { CircuitBreakerOptions } from "../../Common/CircuitBreaker";
 import { RetryOptions } from "../../Common/Retry";
 import { BulkheadOptions } from "../../Common/Bulkhead";
 import { axiosWrapper } from "../../Common/AxiosWrapper";
-import {
-  IdPartitionStrategy,
-  IPartitionStrategy
-} from "./Partition/IdPartitionStrategy";
+import { IdPartitionStrategy } from "./Partition/IdPartitionStrategy";
 import { requester } from "../../Common/ApiResilienceStrategy";
 
 export interface IService {
@@ -30,7 +27,6 @@ class QueryService {
         url: `${cfg.baseUrl}/${QueryRoute}/${QueryVersion}/${url}`
       });
     }
-
     this.client = {
       get: Get
     };
@@ -38,22 +34,29 @@ class QueryService {
   /**
    * Create Actual Time Serie Query
    */
-  CreateActual(strategy: IPartitionStrategy = IdPartitionStrategy(this.cfg)) {
-    return new ActualQuery(this.client, strategy);
+  CreateActual() {
+    return new ActualQuery(
+      this.client,
+      this.cfg.paritionStrategy || IdPartitionStrategy(this.cfg)
+    );
   }
   /**
    * Create Versioned Time Serie Query
    */
-  CreateVersioned(
-    strategy: IPartitionStrategy = IdPartitionStrategy(this.cfg)
-  ) {
-    return new VQ.VersionedQuery(this.client, strategy);
+  CreateVersioned() {
+    return new VQ.VersionedQuery(
+      this.client,
+      this.cfg.paritionStrategy || IdPartitionStrategy(this.cfg)
+    );
   }
   /**
    * Create Market Assessment Time Serie Query
    */
-  CreateMas(strategy: IPartitionStrategy = IdPartitionStrategy(this.cfg)) {
-    return new MasQuery(this.client, strategy);
+  CreateMas() {
+    return new MasQuery(
+      this.client,
+      this.cfg.paritionStrategy || IdPartitionStrategy(this.cfg)
+    );
   }
 }
 /**
