@@ -1,5 +1,7 @@
 ![image](https://www.ark-energy.eu/wp-content/uploads/ark-dark.png)
+
 # Artesian.SDK
+
 [![npm version](https://badge.fury.io/js/artesian-sdk.svg)](https://badge.fury.io/js/artesian-sdk)
 
 This Library provides read access to the Artesian API
@@ -228,6 +230,112 @@ Other recommended libraries to build a period string are:
 
 - [luxon](https://moment.github.io/luxon/index.html)
 - [moment.js](http://momentjs.com/)
+
+## Advanced Configuration
+
+Both the `FromApiKey` and `FromAuthConfig` QueryService methods take advanced configuration options
+
+### Query Partition Strategy
+
+When large amounts of data need to be requested from the service a partitioning strategy can help make the requests more reliable and faster. A default partitioning strategy is built into the sdk. It will partition queries based on the curve ids selected and split into batches of 25 and accumulate the results. The batch size can be specified with an optional configuration field `queryOptions`
+
+```javascript
+QueryService.FromApiKey({
+  baseUrl: string,
+  key: string,
+  queryOptions: { partitionSize: 25 }
+});
+
+QueryService.FromAuthConfig({
+  baseUrl: "https://fake-artesian-env/",
+  audience: "audience",
+  domain: "domain",
+  clientId: "client_id",
+  clientSecret: "client_secret",
+  queryOptions: { partitionSize: 25 }
+});
+```
+
+### Retry Request Execution Strategy
+
+Sometimes requests will fail spontaneously but will work if simply executed again in a few moments. In order to reduce these kinds of errors in the sdk there is a built in retry strategy. The request will retry 3 times with an increasing length of time between requests. The retry strategy can be configured with an optional configuration field `retryOptions`
+
+```javascript
+QueryService.FromApiKey({
+  baseUrl: string,
+  key: string,
+  retryOptions: {
+    times: 3,
+    delayRate: 1000
+  }
+});
+
+QueryService.FromAuthConfig({
+  baseUrl: "https://fake-artesian-env/",
+  audience: "audience",
+  domain: "domain",
+  clientId: "client_id",
+  clientSecret: "client_secret",
+  retryOptions: {
+    times: 3,
+    delayRate: 1000
+  }
+});
+```
+
+### Circuit Breaker Request Execution Strategy
+
+Sometimes a service will go down for a period of time and a request to it will always fail. In order to reduce these kinds of errors in the sdk there is a built in circuit breaker strategy. If a req fails 3 times in a minute the next request and subsequent request will automatically fail. the circuit breaker will do a test request after 1 minute and allow requests through if it succeeds. The circuit breaker strategy can be configured with an optional configuration field `circuitBreakerOptions`
+
+```javascript
+QueryService.FromApiKey({
+  baseUrl: string,
+  key: string,
+  circuitBreakerOptions: {
+    maxBreakerFailures: 3,
+    resetTimeout: 60000,
+    breakerDescription: "Circuit Breaker Open"
+  }
+});
+
+QueryService.FromAuthConfig({
+  baseUrl: "https://fake-artesian-env/",
+  audience: "audience",
+  domain: "domain",
+  clientId: "client_id",
+  clientSecret: "client_secret",
+  circuitBreakerOptions: {
+    maxBreakerFailures: 3,
+    resetTimeout: 60000,
+    breakerDescription: "Circuit Breaker Open"
+  }
+});
+```
+
+### Bulkhead Request Execution Strategy
+
+Too many request to the server at once put it extra load and may result in failures. In order to reduce these kinds of errors in the sdk there is a built in bulkhead strategy. The bulkhead strategy will limit the number if requests in flight to 10 and will queue further requests, once a request finishes a request will be dequeued. The bulkhead strategy can be configured with an optional configuration field `bulkheadOptions`
+
+```javascript
+QueryService.FromApiKey({
+  baseUrl: string,
+  key: string,
+  bulkheadOptions: {
+    parallelism: 10
+  }
+});
+
+QueryService.FromAuthConfig({
+  baseUrl: "https://fake-artesian-env/",
+  audience: "audience",
+  domain: "domain",
+  clientId: "client_id",
+  clientSecret: "client_secret",
+  bulkheadOptions: {
+    parallelism: 10
+  }
+});
+```
 
 ## Links
 
