@@ -264,4 +264,21 @@ describe("VersionedQueries", () => {
       });
     });
   });
+  test("Partitions Queries", async () => {
+    const qs = QueryService.FromApiKey({
+      baseUrl: "lel",
+      key: "hehe",
+      queryOptions: { partitionSize: 1 }
+    });
+
+    await qs
+      .CreateVersioned()
+      .ForMarketData([100000001, 100])
+      .ForLastOfMonths(VersionedQuery.inPeriodRange("P-2M", "P5D"))
+      .InGranularity(Granularity.Day)
+      .InAbsoluteDateRange(new Date("2018-1-1"), new Date("2018-1-10"))
+      .WithTimeTransform(SystemTimeTransform.THERMALYEAR)
+      .Execute();
+    expect(moxios.requests.count()).toEqual(2);
+  });
 });

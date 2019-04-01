@@ -54,4 +54,19 @@ describe("ActualQueries", () => {
           p: `${encodeURIComponent("M+1")},${encodeURIComponent("M+2")}`
         })
       ));
+  test("Partitions Queries", async () => {
+    const qs = QueryService.FromApiKey({
+      baseUrl: "lel",
+      key: "hehe",
+      queryOptions: { partitionSize: 1 }
+    });
+
+    await qs
+      .CreateMas()
+      .ForMarketData([1, 2])
+      .ForProducts(["M+1", "M+2"])
+      .InRelativeInterval(RelativeIntervalType.RollingMonth)
+      .Execute();
+    expect(moxios.requests.count()).toEqual(2);
+  });
 });

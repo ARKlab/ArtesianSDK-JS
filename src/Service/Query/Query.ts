@@ -4,14 +4,15 @@ import {
   ExtractionRangeType,
   RelativeIntervalType
 } from "./Data/Query";
-import { AxiosInstance } from "axios";
+import { IService } from "./QueryService";
+import { IPartitionStrategy } from "./Partition/IdPartitionStrategy";
 
 export class Query {
-  client: AxiosInstance;
   _queryParams: Partial<QueryParams> = {};
-  constructor(client: AxiosInstance) {
-    this.client = client;
-  }
+  constructor(
+    public client: IService,
+    public partitionStrategy: IPartitionStrategy
+  ) {}
   /**
    * Set the market ids to be queried
    * @param ids

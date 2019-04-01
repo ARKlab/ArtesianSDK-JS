@@ -1,3 +1,4 @@
+import * as R from "ramda";
 import * as Q from "./Query";
 import {
   VersionedQueryParams,
@@ -101,11 +102,17 @@ export class VersionedQuery extends Q.Query {
    * Execute the query
    */
   Execute(): Promise<VersionedRow[]> {
-    return buildUrl(this._queryParams)
-      .then(url => this.client.get<InternalVersionedRow[]>(url))
-      .then(res => res.data.map(versionedMapper));
+    return validateQuery(this._queryParams)
+      .then(R.of)
+      .then(this.partitionStrategy.Versioned)
+      .then(R.map(buildUrl))
+      .then(R.map(url => this.client.get<InternalVersionedRow>(url)))
+      .then(x => Promise.all(x))
+      .then(R.unnest)
+      .then(R.map(versionedMapper));
   }
 }
+
 /**
  * Create a version extraction range with dates
  * @param start start date of version range
@@ -183,14 +190,13 @@ function validateQuery(
 ): Promise<VersionedQueryParams> {
   return Q.validateQuery(q).then(() => validateVersionParams(q));
 }
-function buildUrl(q: Partial<VersionedQueryParams>): Promise<string> {
-  return validateQuery(q).then(
-    q =>
-      "vts/" +
-      `${buildVersionRoute(q)}/` +
-      `${Granularity[q.granularity]}/` +
-      `${Q.buildExtractionRangeRoute(q)}` +
-      `?${getUrlQueryParams(q)}`
+function buildUrl(q: VersionedQueryParams): string {
+  return (
+    "vts/" +
+    `${buildVersionRoute(q)}/` +
+    `${Granularity[q.granularity]}/` +
+    `${Q.buildExtractionRangeRoute(q)}` +
+    `?${getUrlQueryParams(q)}`
   );
 }
 function buildVersionRoute(q: VersionedQueryParams): string {

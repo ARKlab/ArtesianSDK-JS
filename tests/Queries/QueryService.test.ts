@@ -1,5 +1,5 @@
 import { QueryService } from "../../src";
-import moxios = require("moxios");
+import * as moxios from "moxios";
 import { getMoxiosUrl } from "../helpers";
 
 describe("QueryService", () => {
@@ -50,5 +50,90 @@ describe("QueryService", () => {
     return qs.client.get("fake").then(() => {
       expect(getMoxiosUrl().headers).toMatchObject({ "x-api-key": "lulz" });
     });
+  });
+  test("Has Retry Success", async () => {
+    moxios.uninstall();
+    moxios.install();
+    moxios.stubRequest(/.*/, {
+      response: [{ message: "lel" }]
+    });
+    const qs = QueryService.FromApiKey({
+      baseUrl: "fake",
+      key: "lulz",
+      retryOptions: { delayRate: 1, times: 3 }
+    });
+    await qs.client.get("fake");
+    expect(moxios.requests.count()).toEqual(1);
+  });
+  test("Has Retry Fail", async () => {
+    moxios.uninstall();
+    moxios.install();
+    moxios.stubRequest(/.*/, {
+      status: 422,
+      statusText: "no good",
+      response: { message: "lel" }
+    });
+    const qs = QueryService.FromApiKey({
+      baseUrl: "fake",
+      key: "lulz",
+      retryOptions: { delayRate: 1, times: 3 }
+    });
+    await qs.client.get("fake").catch(x => x);
+    expect(moxios.requests.count()).toEqual(4);
+  });
+  test("Has Circuit Breaker", async () => {
+    moxios.uninstall();
+    moxios.install();
+    moxios.stubRequest(/.*/, {
+      status: 422,
+      statusText: "no good",
+      response: { message: "lel" }
+    });
+
+    const qs = QueryService.FromApiKey({
+      baseUrl: "fake",
+      key: "lulz",
+      retryOptions: { delayRate: 1, times: 3 }
+    });
+    await expect(
+      qs.client.get("fake").catch(x => {
+        throw x.response.statusText;
+      })
+    ).rejects.toEqual("no good");
+    await expect(
+      qs.client.get("fake").catch(x => {
+        throw x.response.statusText;
+      })
+    ).rejects.toEqual("no good");
+    await expect(
+      qs.client.get("fake").catch(x => {
+        throw x.response.statusText;
+      })
+    ).rejects.toEqual("no good");
+    await expect(qs.client.get("fake")).rejects.toEqual("Circuit Breaker Open");
+  });
+  test("Has Bulkhead", () => {
+    // todo test bulkhead is used
+  });
+  test("Allow User to specify an execution strategy", async () => {
+    moxios.uninstall();
+    moxios.install();
+    moxios.stubRequest(/.*/, {
+      status: 422,
+      statusText: "no good",
+      response: { message: "lel" }
+    });
+
+    const qs = QueryService.FromApiKey({
+      baseUrl: "fake",
+      key: "lulz",
+      executionStrategy: x => x
+    });
+    await expect(
+      qs.client.get("fake").catch(x => {
+        throw x.response.statusText;
+      })
+    ).rejects.toEqual("no good");
+    expect(moxios.requests.count()).toEqual(1);
   });
 });

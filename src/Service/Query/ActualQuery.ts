@@ -1,3 +1,4 @@
+import * as R from "ramda";
 import * as Q from "./Query";
 import {
   ActualQueryParams,
@@ -37,24 +38,27 @@ export class ActualQuery extends Q.Query {
    * Execute the Query
    */
   Execute(): Promise<ActualRow[]> {
-    return buildUrl(this._queryParams)
-      .then(url => this.client.get<InternalActualRow[]>(url))
-      .then(res => res.data.map(actualMapper));
+    return validateQuery(this._queryParams)
+      .then(R.of)
+      .then(this.partitionStrategy.Actual)
+      .then(R.map(buildUrl))
+      .then(R.map(url => this.client.get<InternalActualRow>(url)))
+      .then(x => Promise.all(x))
+      .then(R.unnest)
+      .then(R.map(actualMapper));
   }
 }
-
 function validateQuery(
   q: Partial<ActualQueryParams>
 ): Promise<ActualQueryParams> {
   return Q.validateQuery(q).then(() => validateGranularity(q));
 }
-function buildUrl(q: Partial<ActualQueryParams>): Promise<string> {
-  return validateQuery(q).then(
-    q =>
-      "ts/" +
-      `${Granularity[q.granularity]}/` +
-      `${Q.buildExtractionRangeRoute(q)}` +
-      `?${getUrlQueryParams(q)}`
+function buildUrl(q: ActualQueryParams): string {
+  return (
+    "ts/" +
+    `${Granularity[q.granularity]}/` +
+    `${Q.buildExtractionRangeRoute(q)}` +
+    `?${getUrlQueryParams(q)}`
   );
 }
 function getUrlQueryParams(q: ActualQueryParams): string {

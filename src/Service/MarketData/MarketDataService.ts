@@ -1,12 +1,10 @@
-import { MarketDataServiceExtensions } from './../../Factory/MarketDataServiceExtension';
+import { MarketDataServiceExtensions } from "./../../Factory/MarketDataServiceExtension";
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import {
   ArtesianServiceConfig,
   createApiKeyConfig,
-  createAuthConfig,
-  Auth0Config
+  createAuthConfig
 } from "../../Data/ArtesianServiceConfig";
-import { MetadataVersion } from "../../Data/Constants";
 import { Acl } from "./MarketDataService.Acl";
 import { Admin } from "./MarketDataService.Admin";
 import { ApiKey as ApiKeySdk } from "./MarketDataService.ApiKey";
@@ -16,8 +14,14 @@ import { Operations } from "./MarketDataService.Operations";
 import { SearchFacet } from "./MarketDataService.SearchFacet";
 import { TimeTransformSDK } from "./MarketDataService.TimeTransform";
 import { UpsertCurve } from "./MarketDataService.UpsertCurve";
+import "../../Common/ArtesianUtils";
+import { BulkheadOptions } from "../../Common/Bulkhead";
+import { CircuitBreakerOptions } from "../../Common/CircuitBreaker";
+import { RetryOptions } from "../../Common/Retry";
+import { axiosWrapper } from "../../Common/AxiosWrapper";
+import { MetadataVersion } from "../../Data/Constants";
 
-export  class MarketDataService {
+export class MarketDataService {
   client: AxiosInstance;
   Acl: Acl;
   Admin: Admin;
@@ -31,7 +35,7 @@ export  class MarketDataService {
   MarketDataServiceExtensions: MarketDataServiceExtensions;
 
   constructor(cfg: ArtesianServiceConfig) {
-    const { Get, Post, Delete, Put, Request } = addAuthentication(cfg);
+    const { Get, Post, Delete, Put, Request } = createApi(cfg);
     this.client = axios.create({ baseURL: cfg.baseUrl });
     this.client.get = Get;
     this.client.post = Post;
@@ -47,7 +51,9 @@ export  class MarketDataService {
     this.SearchFacet = new SearchFacet(this.client);
     this.TimeTransform = new TimeTransformSDK(this.client);
     this.UpsertCurve = new UpsertCurve(this.client);
-    this.MarketDataServiceExtensions = new MarketDataServiceExtensions(this.client);
+    this.MarketDataServiceExtensions = new MarketDataServiceExtensions(
+      this.client
+    );
   }
 }
 /**
@@ -55,14 +61,26 @@ export  class MarketDataService {
  * @param cfg Provide an api key and base url for the service
  */
 
-export function FromApiKey(cfg: { baseUrl: string; key: string }) {
+export function FromApiKey(cfg: {
+  baseUrl: string;
+  key: string;
+  retryOptions?: RetryOptions;
+  circuitBreakerOptions?: CircuitBreakerOptions;
+  bulkheadOptions?: BulkheadOptions;
+}) {
   const queryConfig = cfg as Partial<{ baseUrl: string; key: string }>;
   if (typeof queryConfig.key == "undefined") throw "Must provide an api key";
   if (typeof queryConfig.baseUrl == "undefined")
     throw "Must provide a base Address to an Artesian tenant";
 
   return new MarketDataService(
-    createApiKeyConfig({ baseUrl: queryConfig.baseUrl, key: queryConfig.key })
+    createApiKeyConfig({
+      baseUrl: queryConfig.baseUrl,
+      key: queryConfig.key,
+      retryOptions: cfg.retryOptions,
+      circuitBreakerOptions: cfg.circuitBreakerOptions,
+      bulkheadOptions: cfg.bulkheadOptions
+    })
   );
 }
 /**
@@ -75,6 +93,9 @@ export function FromAuthConfig(cfg: {
   domain: string;
   clientId: string;
   clientSecret: string;
+  retryOptions?: RetryOptions;
+  circuitBreakerOptions?: CircuitBreakerOptions;
+  bulkheadOptions?: BulkheadOptions;
 }) {
   const queryConfig = cfg as Partial<{
     baseUrl: string;
@@ -104,107 +125,42 @@ export function FromAuthConfig(cfg: {
       audience: queryConfig.audience,
       domain: queryConfig.domain,
       clientId: queryConfig.clientId,
-      clientSecret: queryConfig.clientSecret
+      clientSecret: queryConfig.clientSecret,
+      retryOptions: cfg.retryOptions,
+      circuitBreakerOptions: cfg.circuitBreakerOptions,
+      bulkheadOptions: cfg.bulkheadOptions
     })
   );
 }
-
-function addAuthentication(cfg: ArtesianServiceConfig) {
-  let auth: Auth = { cfg };
+function createApi(cfg: ArtesianServiceConfig) {
+  const requester: <Response>(
+    r: AxiosRequestConfig
+  ) => Promise<Response> = axiosWrapper(cfg);
   return {
-    async Get<A>(url: string): Promise<A> {
-      const [newAuth, header] = await getHeaders(auth);
-      auth = newAuth;
-
-      return axios
-        .get<A>(`${cfg.baseUrl}/${MetadataVersion}/${url}`, {
-          headers: header
-        })
-        .then(x => x.data);
+    Get<A>(url: string): Promise<A> {
+      return requester<A>({ url: `${cfg.baseUrl}/${MetadataVersion}/${url}` });
     },
-    async Post<A>(
-      url: string,
-      data?: any,
-      config?: AxiosRequestConfig
-    ): Promise<A> {
-      const [newAuth, header] = await getHeaders(auth);
-      auth = newAuth;
-
-      return axios
-        .post<A>(`${cfg.baseUrl}/${MetadataVersion}/${url}`, data, {
-          ...config,
-          headers: header
-        })
-        .then(x => x.data);
+    Post<A>(url: string, data?: any, config?: AxiosRequestConfig): Promise<A> {
+      return requester<A>({
+        ...config,
+        method: "post",
+        url: `${cfg.baseUrl}/${MetadataVersion}/${url}`,
+        data
+      });
     },
-    async Delete(url: string) {
-      const [newAuth, header] = await getHeaders(auth);
-      auth = newAuth;
-
-      return axios
-        .delete(`${cfg.baseUrl}/${MetadataVersion}/${url}`, { headers: header })
-        .then(x => x.data);
+    Delete(url: string) {
+      return requester<any>({
+        method: "delete",
+        url: `${cfg.baseUrl}/${MetadataVersion}/${url}`
+      });
     },
-    async Put<A>(url: string, data?: any) {
-      const [newAuth, header] = await getHeaders(auth);
-      auth = newAuth;
-
-      return axios
-        .put<A>(`${cfg.baseUrl}/${MetadataVersion}/${url}`, data, {
-          headers: header
-        })
-        .then(x => x.data);
+    Put<A>(url: string, data?: any): Promise<A> {
+      return requester<A>({
+        method: "put",
+        url: `${cfg.baseUrl}/${MetadataVersion}/${url}`,
+        data
+      });
     },
-    async Request(config: AxiosRequestConfig) {
-      const [newAuth, header] = await getHeaders(auth);
-      auth = newAuth;
-
-      return axios
-        .request({ ...config, url: `${cfg.baseUrl}/${MetadataVersion}/${config.url}`, headers: header })
-        .then(x => x.data);
-    }
+    Request: requester
   };
 }
-type Auth = {
-  token?: string;
-  cfg: ArtesianServiceConfig;
-};
-type AuthHeaders = Bearer | ApiKey;
-type Bearer = { authorization: string };
-type ApiKey = { "x-api-key": string };
-
-async function ensureToken(auth: Auth0Config, token?: string): Promise<string> {
-  if (token) return token;
-
-  return axios
-    .post(
-      `https://${auth.domain}/oauth/token`,
-      {
-        client_id: auth.clientId,
-        client_secret: auth.clientSecret,
-        audience: auth.audience,
-        grant_type: "client_credentials"
-      },
-      { headers: { "content-type": "application/json" } }
-    )
-    .then(res => res.data)
-    .then(data => data.access_token);
-}
-async function getHeaders(auth: Auth): Promise<[Auth, AuthHeaders]> {
-  switch (auth.cfg.authType.tag) {
-    case "ApiKeyConfig":
-      return [auth, { "x-api-key": auth.cfg.authType.val }];
-    case "Auth0Config":
-      const token = await ensureToken(auth.cfg.authType, auth.token);
-      return [{ ...auth, token }, { authorization: `Bearer ${auth.token}` }];
-  }
-}
-// class Auth {
-//   token?: string;
-//   cfg: ArtesianServiceConfig;
-//   constructor(cfg: ArtesianServiceConfig) {
-//     this.cfg = cfg;
-//   }
-//   getToken
-// }
-
