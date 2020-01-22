@@ -40,7 +40,7 @@ describe("MetaDataQueries", () => {
   test("Read Provider by Curve Id", () =>
     mds.MarketData.ReadMarketDataRegistryById(100000001).then(() => {
       expect(getMoxiosUrl()).toMatchObject({
-        url: "https://fake-artesian-env/v2.1//marketdata/entity/100000001"
+        url: "https://fake-artesian-env/v2.1/marketdata/entity/100000001"
       });
     }));
   test("Read Provider by Curve Range", () =>

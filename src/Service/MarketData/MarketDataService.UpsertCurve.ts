@@ -22,7 +22,7 @@ export class UpsertCurve {
 
     validateUpsertCurveData(data)
 
-    const url = "/marketdata/upsertdata";
+    const url = "marketdata/upsertdata";
 
     return this._client.post(url, data);
   }

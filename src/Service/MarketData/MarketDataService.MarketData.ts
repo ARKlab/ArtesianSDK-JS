@@ -15,7 +15,7 @@ export class MarketData {
    */
   ReadMarketDataRegistry(id: MarketDataIdentifier) {
     validate(id);
-    var url = `/marketdata/entity?provider=${id.provider}&curveName=${id.name}`;
+    var url = `marketdata/entity?provider=${id.provider}&curveName=${id.name}`;
     return this._client.get<Output>(url);
   }
   /**
@@ -27,7 +27,7 @@ export class MarketData {
     if (id < 1)
       throw new Error("Id invalid :" + id);
 
-    var url = "/marketdata/entity/" + id;
+    var url = "marketdata/entity/" + id;
     return this._client.get<Output>(url);
   }
   /**
@@ -50,7 +50,7 @@ export class MarketData {
     versionTo?: Date;
   }) {
     const { id, ...rest } = rangeConfig;
-    const url = `/marketdata/entity/${id}/curves?` + ObjectToQueryString(rest);
+    const url = `marketdata/entity/${id}/curves?` + ObjectToQueryString(rest);
 
     return this._client.get<PagedResult<CurveRange>>(url);
   }
@@ -62,7 +62,7 @@ export class MarketData {
   RegisterMarketData(metadata: Input) {
     validateRegisterMarketDataEntity(metadata);
 
-    const url = "/marketdata/entity";
+    const url = "marketdata/entity";
 
     return this._client.post<Output>(url, metadata);
   }
@@ -82,7 +82,7 @@ export class MarketData {
    * @param id Id of the marketdata to be deleted
    */
   DeleteMarketData(id: number) {
-    const url = "/marketdata/entity/" + id;
+    const url = "marketdata/entity/" + id;
 
     return this._client.delete(url);
   }

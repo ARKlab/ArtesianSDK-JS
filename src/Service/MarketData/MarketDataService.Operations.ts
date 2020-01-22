@@ -12,7 +12,7 @@ export class Operations {
    * Returns MarketData Entity Output
    */
   PerformOperations(operations: OperationsInput) {
-    const url = "/marketdata/operations";
+    const url = "marketdata/operations";
 
     return this._client.post<Output[]>(url, operations);
   }
