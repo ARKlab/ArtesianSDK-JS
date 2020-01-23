@@ -11,12 +11,15 @@ import { RetryOptions } from "../../Common/Retry";
 import { PublicOfferVersion, PublicOfferRoute } from "./Data/Constants";
 import { Enum as Enum } from "./PublicOfferService.Enum";
 import { UnitConfiguration as UnitConfiguration } from "./PublicOfferService.UnitConfiguration";
+import { Query as Query } from "./PublicOfferService.Query";
+
 
 
 export class PublicOfferService {
     client: AxiosInstance;
     Enum: Enum;
     UnitConfiguration: UnitConfiguration;
+    Query: Query;
 
     constructor(cfg: ArtesianServiceConfig) {
       const { Get, Post, Delete, Put, Request } = createApi(cfg);
@@ -28,6 +31,7 @@ export class PublicOfferService {
       this.client.put = Put;
       this.Enum = new Enum(this.client);
       this.UnitConfiguration = new UnitConfiguration(this.client);
+      this.Query = new Query(this.client);
     }
   }
 

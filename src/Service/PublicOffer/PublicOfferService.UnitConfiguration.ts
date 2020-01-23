@@ -54,19 +54,19 @@ export class UnitConfiguration {
    * Returns Unit configuration mapping
    */
   Upsert(unitCfg: UnitConfigurationDto) {
-    var url = `unitconfigurationmappings/${unitCfg.unit}`;
+    var url = `unitconfigurationmappings/${unitCfg.Unit}`;
     return this._client.put<UnitConfigurationDto>(url, unitCfg);
   }
 }
 
 export type UnitConfigurationDto = {
-  unit: string;
-  mappings: GenerationTypeMapping[]
-  eTag: string;
+  Unit: string;
+  Mappings: GenerationTypeMapping[]
+  ETag: string;
 };
 
 type GenerationTypeMapping = {
-  generationType: GenerationType
-  from: Date;
-  to: Date;
+  GenerationType: GenerationType
+  From: Date;
+  To: Date;
 };

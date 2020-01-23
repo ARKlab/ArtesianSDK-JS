@@ -51,16 +51,16 @@ export class Enum {
         cfg.sort ? `sort=${cfg.sort.join(",")}` : ""
     ].filter(Boolean).join("&");
 
-    return this._client.get<PagedResult<Operator>>(url);
+    return this._client.get<PagedResult<Unit>>(url);
   }
 }
 
 export type Operator = {
-  id: number;
-  operator: string;
+  Id: number;
+  Operator: string;
 };
 
 export type Unit = {
-  id: number;
-  unit: string;
+  Id: number;
+  Unit: string;
 };

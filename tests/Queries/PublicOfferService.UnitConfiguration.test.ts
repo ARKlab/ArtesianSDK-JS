@@ -44,9 +44,9 @@ describe("PublicOfferServiceUnitConfiguration", () => {
     }));
     test("Upsert unit configuration", () =>
     pos.UnitConfiguration.Upsert({  
-      unit: 'jim',
-      eTag: 'abc',
-      mappings: []
+      Unit: 'jim',
+      ETag: 'abc',
+      Mappings: []
     }).then(() => {
       expect(getMoxiosUrl()).toMatchObject({
         url: "https://fake-artesian-env/gmepublicoffer/v1.0/unitconfigurationmappings/jim"
