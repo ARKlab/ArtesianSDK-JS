@@ -1,10 +1,7 @@
-import { AxiosInstance } from "axios";
 import { PublicOfferQuery } from "./PublicOfferQuery";
+import { IPublicOfferService } from "./PublicOfferService";
 export class Query {
-  _client: AxiosInstance;
-  constructor(client: AxiosInstance) {
-    this._client = client;
-  }
+  constructor(private _client: IPublicOfferService) {}
 
   /**
    * Create Public offer query

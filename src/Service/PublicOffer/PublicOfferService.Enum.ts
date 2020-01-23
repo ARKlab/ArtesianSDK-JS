@@ -1,11 +1,8 @@
-import { AxiosInstance } from "axios";
 import { PagedResult } from "./Data/Response";
+import { IPublicOfferService } from "./PublicOfferService";
 
 export class Enum {
-  _client: AxiosInstance;
-  constructor(client: AxiosInstance) {
-    this._client = client;
-  }
+  constructor(private _client: IPublicOfferService) {}
 
   /**
    * Read all operators
@@ -18,7 +15,7 @@ export class Enum {
    */
   GetOperators(cfg: { page: number, pageSize: number, operatorFilter: string | null, sort: string[] | null }) {
     if (cfg.page < 1 || cfg.pageSize < 1){
-        throw new Error("Page and Page number need to be greater than 0. Page:" + cfg.page + " Page Size:" + cfg.pageSize);
+        return Promise.reject("Page and Page number need to be greater than 0. Page:" + cfg.page + " Page Size:" + cfg.pageSize);
     }
     var url = "enums/operators?" + 
     [
@@ -28,7 +25,7 @@ export class Enum {
         cfg.sort ? `sort=${cfg.sort.join(",")}` : ""
     ].filter(Boolean).join("&");
 
-    return this._client.get<PagedResult<Operator>>(url);
+    return this._client.Get<PagedResult<Operator>>(url);
   }
     /**
    * Read all units
@@ -41,7 +38,7 @@ export class Enum {
    */
   GetUnits(cfg: { page: number, pageSize: number, unitFilter: string | null, sort: string[] | null }) {
     if (cfg.page < 1 || cfg.pageSize < 1){
-        throw new Error("Page and Page number need to be greater than 0. Page:" + cfg.page + " Page Size:" + cfg.pageSize);
+        return Promise.reject("Page and Page number need to be greater than 0. Page:" + cfg.page + " Page Size:" + cfg.pageSize);
     }
     var url = "enums/units?" + 
     [
@@ -51,7 +48,7 @@ export class Enum {
         cfg.sort ? `sort=${cfg.sort.join(",")}` : ""
     ].filter(Boolean).join("&");
 
-    return this._client.get<PagedResult<Unit>>(url);
+    return this._client.Get<PagedResult<Unit>>(url);
   }
 }
 

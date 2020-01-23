@@ -1,17 +1,14 @@
 import {
     PublicOfferQueryParams,
   } from "./Data/Query";
-import { AxiosInstance } from "axios";
 import { Status, Purpose, BAType, GenerationType, Market, Scope, UnitType, Zone, } from "./Data/Enums";
 import { GMEPublicOfferCurve } from "./Data/Query";
 import { PagedResult } from "./Data/Response";
+import { IPublicOfferService } from "./PublicOfferService";
   
   export class PublicOfferQuery {
-    _client: AxiosInstance;
     _queryParams: Partial<PublicOfferQueryParams> = {};
-    constructor(client: AxiosInstance) {
-        this._client = client;
-    }
+    constructor(private _client: IPublicOfferService) {}
 
    /**
    * Set the date to be queried
@@ -126,8 +123,7 @@ import { PagedResult } from "./Data/Response";
   Execute(): Promise<PagedResult<GMEPublicOfferCurve>> {
     return validateQuery(this._queryParams)
       .then(buildUrl)
-      .then(url => this._client.get<PagedResult<GMEPublicOfferCurve>>(url))
-      .then(x => x.data);
+      .then(url => this._client.Get<PagedResult<GMEPublicOfferCurve>>(url));
   }
 }
 

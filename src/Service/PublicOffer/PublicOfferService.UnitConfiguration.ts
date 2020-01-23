@@ -1,13 +1,10 @@
-import { AxiosInstance } from "axios";
 import { PagedResult } from "./Data/Response";
 import { GenerationType } from './Data/Enums';
+import { IPublicOfferService } from "./PublicOfferService";
 
 
 export class UnitConfiguration {
-  _client: AxiosInstance;
-  constructor(client: AxiosInstance) {
-    this._client = client;
-  }
+  constructor(private _client: IPublicOfferService) {}
 
   /**
    * Read unit configuration mapping
@@ -16,7 +13,7 @@ export class UnitConfiguration {
    */
   GetById(unit: string) {
     var url = `unitconfigurationmappings/${unit}`;
-    return this._client.get<UnitConfigurationDto>(url);
+    return this._client.Get<UnitConfigurationDto>(url);
   }
     /**
    * Read all unit configuration mappings
@@ -37,7 +34,7 @@ export class UnitConfiguration {
         cfg.sort ? `sort=${cfg.sort.join(",")}` : ""
     ].filter(Boolean).join("&");
 
-    return this._client.get<PagedResult<UnitConfigurationDto>>(url);
+    return this._client.Get<PagedResult<UnitConfigurationDto>>(url);
   }
     /**
    * Delete unit configuration mapping
@@ -46,7 +43,7 @@ export class UnitConfiguration {
    */
   Delete(unit: string) {
     var url = `unitconfigurationmappings/${unit}`;
-    return this._client.delete(url);
+    return this._client.Delete(url);
   }
   /**
    * Update the unit configuration mapping
@@ -55,7 +52,7 @@ export class UnitConfiguration {
    */
   Upsert(unitCfg: UnitConfigurationDto) {
     var url = `unitconfigurationmappings/${unitCfg.Unit}`;
-    return this._client.put<UnitConfigurationDto>(url, unitCfg);
+    return this._client.Put<UnitConfigurationDto>(url, unitCfg);
   }
 }
 

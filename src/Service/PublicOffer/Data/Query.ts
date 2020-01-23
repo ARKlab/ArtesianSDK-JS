@@ -1,6 +1,6 @@
 import { Purpose, Status, Market, Scope, BAType, Zone, UnitType, GenerationType } from "./Enums"
 export type PublicOfferQueryParams = {
-    Date: Date;
+    date: Date;
     purpose: Purpose;
     status: Status;
     operator: string[];

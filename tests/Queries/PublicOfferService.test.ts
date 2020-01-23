@@ -15,7 +15,7 @@ describe("PublicOfferService", () => {
       baseUrl: "fake",
       key: "lulz"
     });
-    return qs.client.get("fake").then(() => {
+    return qs.client.Get("fake").then(() => {
       expect(getMoxiosUrl().headers).toMatchObject({ "x-api-key": "lulz" });
     });
   });
@@ -29,7 +29,7 @@ describe("PublicOfferService", () => {
       audience: "aud",
       domain: "do"
     });
-    return qs.client.get("fake").then(() => {
+    return qs.client.Get("fake").then(() => {
       expect(JSON.parse(moxios.requests.first().config.data)).toMatchObject({
         client_id: "id",
         client_secret: "sec",
@@ -47,7 +47,7 @@ describe("PublicOfferService", () => {
       baseUrl: "fake",
       key: "lulz"
     });
-    return qs.client.get("fake").then(() => {
+    return qs.client.Get("fake").then(() => {
       expect(getMoxiosUrl().headers).toMatchObject({ "x-api-key": "lulz" });
     });
   });
@@ -62,7 +62,7 @@ describe("PublicOfferService", () => {
       key: "lulz",
       retryOptions: { delayRate: 1, times: 3 }
     });
-    await qs.client.get("fake");
+    await qs.client.Get("fake");
     expect(moxios.requests.count()).toEqual(1);
   });
   test("Has Retry Fail", async () => {
@@ -78,7 +78,7 @@ describe("PublicOfferService", () => {
       key: "lulz",
       retryOptions: { delayRate: 1, times: 3 }
     });
-    await qs.client.get("fake").catch(x => x);
+    await qs.client.Get("fake").catch(x => x);
     expect(moxios.requests.count()).toEqual(4);
   });
   test("Has Circuit Breaker", async () => {
@@ -96,21 +96,21 @@ describe("PublicOfferService", () => {
       retryOptions: { delayRate: 1, times: 3 }
     });
     await expect(
-      qs.client.get("fake").catch(x => {
+      qs.client.Get("fake").catch(x => {
         throw x.response.statusText;
       })
     ).rejects.toEqual("no good");
     await expect(
-      qs.client.get("fake").catch(x => {
+      qs.client.Get("fake").catch(x => {
         throw x.response.statusText;
       })
     ).rejects.toEqual("no good");
     await expect(
-      qs.client.get("fake").catch(x => {
+      qs.client.Get("fake").catch(x => {
         throw x.response.statusText;
       })
     ).rejects.toEqual("no good");
-    await expect(qs.client.get("fake")).rejects.toEqual("Circuit Breaker Open");
+    await expect(qs.client.Get("fake")).rejects.toEqual("Circuit Breaker Open");
   });
   test("Has Bulkhead", () => {
     // todo test bulkhead is used

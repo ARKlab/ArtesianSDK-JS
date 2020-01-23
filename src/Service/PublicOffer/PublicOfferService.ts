@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
+import { AxiosRequestConfig } from "axios";
 import {
     ArtesianServiceConfig,
     createApiKeyConfig,
@@ -16,22 +16,18 @@ import { Query as Query } from "./PublicOfferService.Query";
 
 
 export class PublicOfferService {
-    client: AxiosInstance;
     Enum: Enum;
     UnitConfiguration: UnitConfiguration;
     Query: Query;
+    client: IPublicOfferService;
 
     constructor(cfg: ArtesianServiceConfig) {
-      const { Get, Post, Delete, Put, Request } = createApi(cfg);
-      this.client = axios.create({ baseURL: cfg.baseUrl });
-      this.client.get = Get;
-      this.client.post = Post;
-      this.client.delete = Delete;
-      this.client.request = Request;
-      this.client.put = Put;
-      this.Enum = new Enum(this.client);
-      this.UnitConfiguration = new UnitConfiguration(this.client);
-      this.Query = new Query(this.client);
+      const wrappedApi = createApi(cfg);
+      
+      this.client = wrappedApi;
+      this.Enum = new Enum(wrappedApi);
+      this.UnitConfiguration = new UnitConfiguration(wrappedApi);
+      this.Query = new Query(wrappedApi);
     }
   }
 
@@ -143,3 +139,5 @@ export function FromApiKey(cfg: {
       Request: requester
     };
   }
+
+  export type IPublicOfferService = ReturnType<typeof createApi>
