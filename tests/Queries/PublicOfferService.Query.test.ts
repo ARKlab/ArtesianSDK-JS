@@ -36,7 +36,7 @@ describe("PublicOfferServiceQuery", () => {
       .then(() => {
         expect(getMoxiosUrl()).toMatchObject({
           url:
-            "https://fake-artesian-env/gmepublicoffer/v1.0/extract/2018-01-01/1/1"
+            "https://fake-artesian-env/gmepublicoffer/v1.0/extract/2018-01-01/OFF/REJ"
         });
         expect(getMoxiosUrl().method).toEqual("get");
       }));
@@ -82,7 +82,7 @@ describe("PublicOfferServiceQuery", () => {
       .Execute()
       .then(() => {
         expect(getMoxiosUrl()).toMatchObject({
-          qs: { scope: '3,4', baType: '1', generationType: '4', unit: 'jim,bill', unitType: '3', zone: '7', page: '9', pageSize: '99' }
+          qs: { scope: 'CA,GR1', baType: 'NETT', generationType: 'COAL', unit: 'jim,bill', unitType: 'UCV', zone: 'FRAN', page: '9', pageSize: '99' }
         });
       })); 
 });
