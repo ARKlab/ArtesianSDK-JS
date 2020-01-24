@@ -29,10 +29,11 @@ export type PublicOfferQueryParams = {
         GenerationType: GenerationType;
         Unit: string;
         Operator: string;
+        Quantity: number;
         AwardedQuantity: number;
         EnergyPrice: number;
         MeritOrder: number;
-        PartialQuantityAccepted: string;
+        PartialQuantityAccepted: boolean;
         ADJQuantity: number;
         ADJEnergyPrice: number;
   }
