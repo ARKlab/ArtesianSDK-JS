@@ -52,14 +52,23 @@ export class UnitConfiguration {
    */
   Upsert(unitCfg: UnitConfigurationDto) {
     var url = `unitconfigurationmappings/${unitCfg.Unit}`;
-    return this._client.Put<UnitConfigurationDto>(url, unitCfg);
+
+    const data = {
+      ...unitCfg,
+      Mappings: unitCfg.Mappings.map(x => ({
+        ...x,
+        From: x.From.toISOString().split("T")[0],
+        To: x.To.toISOString().split("T")[0]
+      }))
+    };
+    return this._client.Put<UnitConfigurationDto>(url, data);
   }
 }
 
 export type UnitConfigurationDto = {
   Unit: string;
-  Mappings: GenerationTypeMapping[]
-  ETag: string;
+  Mappings: GenerationTypeMapping[];
+  ETag: string | null;
 };
 
 type GenerationTypeMapping = {
