@@ -90,6 +90,73 @@ test("MarketData Factory actual time series", async () => {
   expect(getMoxiosUrl().method).toEqual("post");
 });
 
+test("MarketData Factory auction time series", async () => {
+  moxios.uninstall();
+  moxios.install();
+  let x: Output = {
+    marketDataId: 0,
+    providerName: "TestProvider",
+    marketDataName: "TestMarketDataName",
+    originalGranularity: Granularity.Day,
+    type: MarketDataType.AuctionTimeSerie,
+    originalTimezone: "CET",
+    aggregationRule: AggregationRule.AverageAndReplicate,
+    transform: {
+      id: 1,
+      name: "TimeTName",
+      eTag: "00000000-0000-0000-0000-000000000000",
+      definedBy: TransformDefinitionType.System,
+      type: TransformType.SimpleShift
+    },
+    lastUpdated: new Date(),
+    created: new Date()
+  };
+
+  moxios.stubRequest(/.*/, { response: { data: x } });
+  var marketDataEntity: Input = {
+    marketDataId: 0,
+    providerName: "TestProvider",
+    marketDataName: "TestMarketData",
+    originalGranularity: Granularity.Day,
+    type: MarketDataType.AuctionTimeSerie,
+    originalTimezone: "CET",
+    aggregationRule: AggregationRule.Undefined
+  };
+
+  var marketData = mds.MarketDataServiceExtensions.getMarketDataReference(mds, {
+    provider: marketDataEntity.providerName,
+    name: marketDataEntity.marketDataName
+  });
+
+  await marketData.Register(marketDataEntity);
+
+  var RegisterMarketData = await marketData.isRegistered();
+  expect(RegisterMarketData).toBe(true);
+
+  marketData.metaData.aggregationRule = AggregationRule.SumAndDivide;
+
+  await marketData.update();
+  await marketData.load();
+
+  expect(marketData.metaData.aggregationRule).toBe(
+    AggregationRule.SumAndDivide
+  );
+
+  var writeMarketData = marketData.editAuction(marketData);
+  
+  writeMarketData.AddData(new Date(2018, 10, 3), [{price: 100, quantity: 10}], [{price: 120, quantity: 12}]);
+  writeMarketData.AddData(new Date(2018, 10, 4), [{price: 100, quantity: 10}], [{price: 120, quantity: 12}]);
+
+  await writeMarketData.Save(getUTCDate(new Date()));
+
+  expect(
+    getMoxiosUrl()
+      .url.split("/")
+      .slice(-2)
+  ).toEqual(["marketdata", "entity"]);
+  expect(getMoxiosUrl().method).toEqual("post");
+});
+
 test("MarketData Factory versioned time series", async () => {
   const mds = MarketDataService.FromApiKey(cfg);
 

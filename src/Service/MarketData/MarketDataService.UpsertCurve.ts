@@ -1,5 +1,5 @@
+import { AuctionBids } from './../../Factory/AuctionTimeSerie';
 import { validateUpsertCurveData } from './../../Common/validators';
-import { MarketAssessmentValue } from './MarketDataService.UpsertCurve';
 import { AxiosInstance } from "axios";
 import { MarketDataIdentifier } from "./MarketDataService.MarketData";
 
@@ -37,6 +37,7 @@ export type UpsertCurveData = {
   rows?: Map<Date,number | undefined>;
   deferCommandExecution?: boolean;
   deferDataGeneration?: boolean;
+  auctionRows?: Map<Date, AuctionBids>;
 };
 
 export type MarketAssessmentValue = {

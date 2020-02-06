@@ -1,3 +1,4 @@
+import { AuctionSide } from './../../../Data/Enums';
 export type InternalActualRow = {
   P: string;
   C: string;
@@ -25,6 +26,36 @@ export function actualMapper(row: InternalActualRow): ActualRow {
     value: row.D,
     competenceStart: row.S,
     competenceEnd: row.E
+  };
+}
+
+export type InternalAuctionRow = {
+  P: string;
+  N: string;
+  ID: number;
+  T: Date;
+  S: AuctionSide;
+  D: number;
+  Q: number;
+};
+export type AuctionRow = {
+  providerName: string;
+  curveName: string;
+  tsId: number;
+  bidTimestamp: Date;
+  side: AuctionSide;
+  price: number;
+  quantity: number;
+};
+export function auctionMapper(row: InternalAuctionRow): AuctionRow {
+  return {
+    providerName: row.P,
+    curveName: row.N,
+    tsId: row.ID,
+    bidTimestamp: row.T,
+    side: row.S,
+    price: row.D,
+    quantity: row.Q
   };
 }
 

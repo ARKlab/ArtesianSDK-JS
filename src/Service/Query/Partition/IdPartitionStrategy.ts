@@ -1,16 +1,19 @@
 import * as R from "ramda";
 import {
-  QueryParams,
+  QueryParamsWithInterval,
   CurveSelectionType,
   ActualQueryParams,
+  AuctionQueryParams,
   VersionedQueryParams,
-  MasQueryParams
+  MasQueryParams,
+  QueryParamsWithRange
 } from "../Data/Query";
 import { partitionIds } from "../../../Common/ArtesianUtils";
 import { queryOptions } from "../../../Data/ArtesianServiceConfig";
 
 export interface IPartitionStrategy {
   Actual: (a: ActualQueryParams[]) => ActualQueryParams[];
+  Auction: (a: AuctionQueryParams[]) => AuctionQueryParams[];
   Versioned: (a: VersionedQueryParams[]) => VersionedQueryParams[];
   Mas: (a: MasQueryParams[]) => MasQueryParams[];
 }
@@ -18,13 +21,30 @@ export function IdPartitionStrategy(cfg: {
   queryOptions?: queryOptions;
 }): IPartitionStrategy {
   return {
-    Actual: R.chain(expandParams(cfg)),
-    Versioned: R.chain(expandParams(cfg)),
-    Mas: R.chain(expandParams(cfg))
+    Actual: R.chain(expandParamsWithInterval(cfg)),
+    Auction: R.chain(expandParams(cfg)),
+    Versioned: R.chain(expandParamsWithInterval(cfg)),
+    Mas: R.chain(expandParamsWithInterval(cfg))
   };
 }
 
-const expandParams = <Params extends QueryParams>(cfg: {
+// !? extends QueryParamsWithInterval
+// QueryParamsWithRange
+const expandParamsWithInterval = <Params extends QueryParamsWithInterval>(cfg: {
+  queryOptions?: queryOptions;
+}) => (queryParams: Params) => {
+  switch (queryParams.curveSelection.tag) {
+    case CurveSelectionType.FilterSelection:
+      return [queryParams];
+    case CurveSelectionType.IdSelection:
+      return partitionIds(queryParams.curveSelection.val, cfg.queryOptions).map(
+        group =>
+          R.mergeDeepRight(queryParams, { curveSelection: { val: group } })
+      );
+  }
+};
+
+const expandParams = <Params extends QueryParamsWithRange>(cfg: {
   queryOptions?: queryOptions;
 }) => (queryParams: Params) => {
   switch (queryParams.curveSelection.tag) {
