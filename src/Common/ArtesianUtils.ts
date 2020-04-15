@@ -109,6 +109,7 @@ function _orderOf(granularity: Granularity): number {
     case Granularity.Year:
       return 525600;
   }
+  // @ts-ignore
   throw new Error("Granularity : " + granularity + " is not supported");
 }
 

@@ -15,7 +15,7 @@ export class SearchFacet {
   Search(filter: SearchFilter) {
     validateSearchFilter(filter);
     const url =
-      "/marketdata/searchfacet" +
+      "marketdata/searchfacet" +
       `?page=${filter.page}` +
       `&pageSize=${filter.pageSize}` +
       `&searchText=${filter.searchText}` +

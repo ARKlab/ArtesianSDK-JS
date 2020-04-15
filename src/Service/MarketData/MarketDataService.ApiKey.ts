@@ -15,7 +15,7 @@ export class ApiKey {
     if(keyRecord.id !=0){
       throw new Error("Api Key must be 0")
     }
-    var url = "/apikey/entity";
+    var url = "apikey/entity";
 
     return this._client.post<Output>(url, keyRecord);
   }
@@ -25,7 +25,7 @@ export class ApiKey {
    * Returns ApiKey Output entity
    */
   GetByKey(key: string) {
-    var url = `/apikey/entity?key=${key}`;
+    var url = `apikey/entity?key=${key}`;
 
     return this._client.get<Output>(url);
   }
@@ -35,7 +35,7 @@ export class ApiKey {
    * Returns ApiKey Output entity
    */
   GetById(id: number) {
-    var url = `/apikey/entity/${id}`;
+    var url = `apikey/entity/${id}`;
 
     return this._client.get<Output>(url);
   }
@@ -50,7 +50,7 @@ export class ApiKey {
     if (page < 1) throw "page needs to be greater than 0";
     if (pageSize < 1) throw "pageSize needs to be greater than 0";
     var url =
-      "/apikey/entity?" +
+      "apikey/entity?" +
       [`pageSize=${pageSize}`, `page=${page}`, `userId=${userId}`].join("&");
 
     return this._client.get<PagedResult<Output>>(url);
@@ -60,7 +60,7 @@ export class ApiKey {
    * @param id The id
    */
   Delete(id: number) {
-    var url = "/apikey/entity/" + id;
+    var url = "apikey/entity/" + id;
 
     return this._client.delete(url);
   }

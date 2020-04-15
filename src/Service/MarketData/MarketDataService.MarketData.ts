@@ -1,7 +1,13 @@
 import { AxiosInstance } from "axios";
 import { PagedResult } from "./Data/Response";
 import { Output, Input } from "./Data/MarketDataEntity";
-import { isValidProvider, isValidMarketDataName, validateRegisterMarketDataEntity, validateUpdateMarketDataEntity } from "../../Common/validators";
+import {
+  isValidProvider,
+  isValidMarketDataName,
+  validateRegisterMarketDataEntity,
+  validateUpdateMarketDataEntity,
+} from "../../Common/validators";
+import * as L from "luxon";
 
 export class MarketData {
   _client: AxiosInstance;
@@ -15,7 +21,7 @@ export class MarketData {
    */
   ReadMarketDataRegistry(id: MarketDataIdentifier) {
     validate(id);
-    var url = `/marketdata/entity?provider=${id.provider}&curveName=${id.name}`;
+    var url = `marketdata/entity?provider=${id.provider}&curveName=${id.name}`;
     return this._client.get<Output>(url);
   }
   /**
@@ -24,15 +30,14 @@ export class MarketData {
    * Returns MarketData Entity Output
    */
   ReadMarketDataRegistryById(id: number) {
-    if (id < 1)
-      throw new Error("Id invalid :" + id);
+    if (id < 1) throw new Error("Id invalid :" + id);
 
-    var url = "/marketdata/entity/" + id;
+    var url = "marketdata/entity/" + id;
     return this._client.get<Output>(url);
   }
   /**
    * Read paged set of available versions of the marketdata by id
-   * @name rangeConfig 
+   * @name rangeConfig
    * @param id Id of the marketdata to be retrieved
    * @param page Page number
    * @param pageSize Page size
@@ -41,16 +46,9 @@ export class MarketData {
    * @param versionTo End date of version range
    * Returns Paged result of CurveRange entity
    */
-  ReadCurveRange(rangeConfig: {
-    id: number;
-    page: number;
-    pageSize: number;
-    product?: string;
-    versionFrom?: Date;
-    versionTo?: Date;
-  }) {
+  ReadCurveRange(rangeConfig: RangeConfig & { id: number }) {
     const { id, ...rest } = rangeConfig;
-    const url = `/marketdata/entity/${id}/curves?` + ObjectToQueryString(rest);
+    const url = `marketdata/entity/${id}/curves?` + createQueryString(rest);
 
     return this._client.get<PagedResult<CurveRange>>(url);
   }
@@ -62,7 +60,7 @@ export class MarketData {
   RegisterMarketData(metadata: Input) {
     validateRegisterMarketDataEntity(metadata);
 
-    const url = "/marketdata/entity";
+    const url = "marketdata/entity";
 
     return this._client.post<Output>(url, metadata);
   }
@@ -82,7 +80,7 @@ export class MarketData {
    * @param id Id of the marketdata to be deleted
    */
   DeleteMarketData(id: number) {
-    const url = "/marketdata/entity/" + id;
+    const url = "marketdata/entity/" + id;
 
     return this._client.delete(url);
   }
@@ -102,15 +100,35 @@ type CurveRange = {
   rangeEnd: Date;
 };
 
-function ObjectToQueryString(obj: any) {
+type RangeConfig = {
+  page: number;
+  pageSize: number;
+  product?: string;
+  versionFrom?: Date;
+  versionTo?: Date;
+};
+
+function createQueryString(obj: RangeConfig) {
   return Object.keys(obj)
-    .map(k => [k, obj[k]])
+    .map((k) => [k, (obj as any)[k]])
     .filter(([_, v]) => Boolean(v))
-    .map(x => x.join("="))
+    .map(([k, v]) => {
+      switch (k) {
+        case "versionFrom":
+        case "versionTo":
+          return [
+            k,
+            L.DateTime.fromJSDate(v).toUTC().toFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"),
+          ];
+        default:
+          return [k, v];
+      }
+    })
+    .map((x) => x.join("="))
     .join("&");
 }
 
-function validate(marketDataIdentifier: MarketDataIdentifier){
-  isValidProvider(marketDataIdentifier.provider,1,50)
-  isValidMarketDataName(marketDataIdentifier.name,1,250)
+function validate(marketDataIdentifier: MarketDataIdentifier) {
+  isValidProvider(marketDataIdentifier.provider, 1, 50);
+  isValidMarketDataName(marketDataIdentifier.name, 1, 250);
 }

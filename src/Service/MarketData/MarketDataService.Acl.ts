@@ -12,7 +12,7 @@ export class Acl {
    * Returns Enumerable of AuthorizationPath Output entity
    */
   ReadRolesByPath(path: string) {
-    var url = "/acl/me/" + path;
+    var url = "acl/me/" + path;
 
     return this._client.get<AclPath>(url);
   }
@@ -34,7 +34,7 @@ export class Acl {
     if (pageSize < 1) throw "pageSize needs to be greater than 0";
 
     var url =
-      "/acl?" +
+      "acl?" +
       [
         `pageSize=${pageSize}`,
         `page=${page}`,
@@ -51,7 +51,7 @@ export class Acl {
    * @param upsert The entity we want to upsert
    */
   UpsertRoles(upsert: AclPath) {
-    var url = "/acl";
+    var url = "acl";
 
     return this._client.post<void>(url, upsert);
   }
@@ -60,7 +60,7 @@ export class Acl {
    * @param add The entity we want to add. At the path add.Path we add the add.Roles
    */
   AddRoles(add: AclPath) {
-    var url = "/acl/roles";
+    var url = "acl/roles";
 
     return this._client.post<void>(url, add);
   }
@@ -69,7 +69,7 @@ export class Acl {
    * @param upsert The entity we want to remove. At the path remove.Path we remove the remove.Roles
    */
   RemoveRoles(upsert: AclPath) {
-    var url = "/acl/roles";
+    var url = "acl/roles";
     return this._client.request<void>({ url, data: upsert, method: "delete" });
   }
 }

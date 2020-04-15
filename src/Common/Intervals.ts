@@ -71,6 +71,7 @@ function AtStartOfIntervalDate(date: Date, period: DatePeriod)
             return firstDayOfTheYear(date);
     }
 
+  // @ts-ignore
   return date;
 }
 /**

@@ -1,5 +1,4 @@
 import { validateUpsertCurveData } from './../../Common/validators';
-import { MarketAssessmentValue } from './MarketDataService.UpsertCurve';
 import { AxiosInstance } from "axios";
 import { MarketDataIdentifier } from "./MarketDataService.MarketData";
 
@@ -22,7 +21,7 @@ export class UpsertCurve {
 
     validateUpsertCurveData(data)
 
-    const url = "/marketdata/upsertdata";
+    const url = "marketdata/upsertdata";
 
     return this._client.post(url, data);
   }
