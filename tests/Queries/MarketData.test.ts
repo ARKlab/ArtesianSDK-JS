@@ -4,7 +4,7 @@ import {
   TransformDefinitionType,
   TransformType,
   MarketDataType,
-  AggregationRule
+  AggregationRule,
 } from "../../src/Service/MarketData/Data/MarketDataEntity";
 import * as moxios from "moxios";
 import { MarketDataService } from "../../src";
@@ -14,7 +14,7 @@ import { OperationType } from "../../src/Service/MarketData/MarketDataService.Op
 
 const cfg = {
   baseUrl: "https://fake-artesian-env",
-  key: "5418B0DB-7AB9-4875-81BA-6EE609E073B6"
+  key: "5418B0DB-7AB9-4875-81BA-6EE609E073B6",
 };
 
 const mds = MarketDataService.FromApiKey(cfg);
@@ -31,16 +31,16 @@ describe("MetaDataQueries", () => {
   test("Read Provider by Curve Name", () =>
     mds.MarketData.ReadMarketDataRegistry({
       provider: "TestProvider",
-      name: "TestCurveName"
+      name: "TestCurveName",
     }).then(() => {
       expect(getMoxiosUrl()).toMatchObject({
-        qs: { provider: "TestProvider", curveName: "TestCurveName" }
+        qs: { provider: "TestProvider", curveName: "TestCurveName" },
       });
     }));
   test("Read Provider by Curve Id", () =>
     mds.MarketData.ReadMarketDataRegistryById(100000001).then(() => {
       expect(getMoxiosUrl()).toMatchObject({
-        url: "https://fake-artesian-env/v2.1/marketdata/entity/100000001"
+        url: "https://fake-artesian-env/v2.1/marketdata/entity/100000001",
       });
     }));
   test("Read Provider by Curve Range", () =>
@@ -49,18 +49,17 @@ describe("MetaDataQueries", () => {
       page: 1,
       pageSize: 1,
       product: "M+1",
-      versionFrom: new Date(2018, 7, 19, 12, 0),
-      versionTo: new Date(2017, 7, 19, 12, 0)
+      versionFrom: new Date("2018-08-19T13:00:00+0100"),
+      versionTo: new Date("2017-08-19T13:00:00+0100"),
     }).then(() => {
       expect(getMoxiosUrl()).toMatchObject({
         qs: {
           page: "1",
           pageSize: "1",
           product: "M+1",
-          versionFrom:
-            "Sun Aug 19 2018 12:00:00 GMT+0100 (Irish Standard Time)",
-          versionTo: "Sat Aug 19 2017 12:00:00 GMT+0100 (Irish Standard Time)"
-        }
+          versionFrom: "2018-08-19T12:00:00Z",
+          versionTo: "2017-08-19T12:00:00Z",
+        },
       });
     }));
 
@@ -72,13 +71,12 @@ describe("MetaDataQueries", () => {
       originalGranularity: Granularity.Day,
       type: MarketDataType.VersionedTimeSerie,
       originalTimezone: "CET",
-      aggregationRule: AggregationRule.Undefined
+      aggregationRule: AggregationRule.Undefined,
     }).then(() => {
-      expect(
-        getMoxiosUrl()
-          .url.split("/")
-          .slice(-2)
-      ).toEqual(["marketdata", "entity"]);
+      expect(getMoxiosUrl().url.split("/").slice(-2)).toEqual([
+        "marketdata",
+        "entity",
+      ]);
       expect(getMoxiosUrl().method).toEqual("post");
     }));
 
@@ -90,23 +88,23 @@ describe("MetaDataQueries", () => {
       originalGranularity: Granularity.Day,
       type: MarketDataType.VersionedTimeSerie,
       originalTimezone: "CET",
-      aggregationRule: AggregationRule.Undefined
+      aggregationRule: AggregationRule.Undefined,
     }).then(() => {
-      expect(
-        getMoxiosUrl()
-          .url.split("/")
-          .slice(-3)
-      ).toEqual(["marketdata", "entity", "1"]);
+      expect(getMoxiosUrl().url.split("/").slice(-3)).toEqual([
+        "marketdata",
+        "entity",
+        "1",
+      ]);
       expect(getMoxiosUrl().method).toEqual("put");
     }));
 
   test("Delete Market Data", () =>
     mds.MarketData.DeleteMarketData(1).then(() => {
-      expect(
-        getMoxiosUrl()
-          .url.split("/")
-          .slice(-3)
-      ).toEqual(["marketdata", "entity", "1"]);
+      expect(getMoxiosUrl().url.split("/").slice(-3)).toEqual([
+        "marketdata",
+        "entity",
+        "1",
+      ]);
       expect(getMoxiosUrl().method).toEqual("delete");
     }));
   //#endregion
@@ -118,14 +116,14 @@ describe("MetaDataQueries", () => {
       pageSize: 1,
       searchText: "testText",
       sorts: ["Type desc", "MarketDataName desc"],
-      filters: { TestKey: ["TestValue"] }
+      filters: { TestKey: ["TestValue"] },
     }).then(() => {
       expect(getMoxiosUrl()).toMatchObject({
         qs: {
           page: "1",
           pageSize: "1",
-          searchText: "testText"
-        }
+          searchText: "testText",
+        },
       });
     }));
   //#endregion
@@ -136,24 +134,23 @@ describe("MetaDataQueries", () => {
       ids: [
         {
           id: 1,
-          eTag: "provaEtag"
-        }
+          eTag: "provaEtag",
+        },
       ],
       operationList: [
         {
           params: {
             tagKey: "Pippo",
-            tagValue: "Valore"
+            tagValue: "Valore",
           },
-          type: OperationType.EnableTag
-        }
-      ]
+          type: OperationType.EnableTag,
+        },
+      ],
     }).then(() => {
-      expect(
-        getMoxiosUrl()
-          .url.split("/")
-          .slice(-2)
-      ).toEqual(["marketdata", "operations"]);
+      expect(getMoxiosUrl().url.split("/").slice(-2)).toEqual([
+        "marketdata",
+        "operations",
+      ]);
       expect(getMoxiosUrl().method).toEqual("post");
     }));
 
@@ -164,17 +161,16 @@ describe("MetaDataQueries", () => {
         {
           params: {
             tagKey: "Pippo",
-            tagValue: "Valore"
+            tagValue: "Valore",
           },
-          type: OperationType.DisableTag
-        }
-      ]
+          type: OperationType.DisableTag,
+        },
+      ],
     }).then(() => {
-      expect(
-        getMoxiosUrl()
-          .url.split("/")
-          .slice(-2)
-      ).toEqual(["marketdata", "operations"]);
+      expect(getMoxiosUrl().url.split("/").slice(-2)).toEqual([
+        "marketdata",
+        "operations",
+      ]);
       expect(getMoxiosUrl().method).toEqual("post");
     }));
   //#endregion
@@ -188,13 +184,12 @@ describe("MetaDataQueries", () => {
       downloadedAt: new Date(),
       //rows: { "Sun Aug 19 2018 12:00:00 GMT+0100 (Irish Standard Time)": 21.4 }, deferCommandExecution: false,
       rows: new Map([[getUTCDate(new Date(2018, 1, 1, 0, 0)), 21.4]]),
-      deferDataGeneration: true
+      deferDataGeneration: true,
     }).then(() => {
-      expect(
-        getMoxiosUrl()
-          .url.split("/")
-          .slice(-2)
-      ).toEqual(["marketdata", "upsertdata"]);
+      expect(getMoxiosUrl().url.split("/").slice(-2)).toEqual([
+        "marketdata",
+        "upsertdata",
+      ]);
       expect(getMoxiosUrl().method).toEqual("post");
     }));
 
@@ -203,13 +198,12 @@ describe("MetaDataQueries", () => {
       id: { provider: "TestProviderName", name: "TestCurveName" },
       timezone: "CET",
       downloadedAt: new Date(),
-      marketAssessment: { "2018-4-5": { test: {} } }
+      marketAssessment: { "2018-4-5": { test: {} } },
     }).then(() => {
-      expect(
-        getMoxiosUrl()
-          .url.split("/")
-          .slice(-2)
-      ).toEqual(["marketdata", "upsertdata"]);
+      expect(getMoxiosUrl().url.split("/").slice(-2)).toEqual([
+        "marketdata",
+        "upsertdata",
+      ]);
       expect(getMoxiosUrl().method).toEqual("post");
     }));
 
@@ -218,13 +212,12 @@ describe("MetaDataQueries", () => {
       id: { provider: "TestProviderName", name: "TestCurveName" },
       timezone: "CET",
       downloadedAt: new Date(),
-      rows: new Map([[getUTCDate(new Date(2018, 8, 19, 12, 0, 0, 0)), 21.4]])
+      rows: new Map([[getUTCDate(new Date(2018, 8, 19, 12, 0, 0, 0)), 21.4]]),
     }).then(() => {
-      expect(
-        getMoxiosUrl()
-          .url.split("/")
-          .slice(-2)
-      ).toEqual(["marketdata", "upsertdata"]);
+      expect(getMoxiosUrl().url.split("/").slice(-2)).toEqual([
+        "marketdata",
+        "upsertdata",
+      ]);
       expect(getMoxiosUrl().method).toEqual("post");
     }));
   //#endregion
@@ -232,11 +225,7 @@ describe("MetaDataQueries", () => {
   //#region TimeTransform
   test("Read Time Transform by Id", () =>
     mds.TimeTransform.GetById(1).then(() => {
-      expect(
-        getMoxiosUrl()
-          .url.split("/")
-          .slice(-2)
-      ).toEqual(["entity", "1"]);
+      expect(getMoxiosUrl().url.split("/").slice(-2)).toEqual(["entity", "1"]);
     }));
 
   test("Read Time Transform", () =>
@@ -245,8 +234,8 @@ describe("MetaDataQueries", () => {
         qs: {
           page: "1",
           pageSize: "1",
-          userDefined: "true"
-        }
+          userDefined: "true",
+        },
       });
     }));
 
@@ -255,8 +244,8 @@ describe("MetaDataQueries", () => {
       expect(getMoxiosUrl()).toMatchObject({
         headers: {
           Accept: "application/json, text/plain, */*",
-          "x-api-key": "5418B0DB-7AB9-4875-81BA-6EE609E073B6"
-        }
+          "x-api-key": "5418B0DB-7AB9-4875-81BA-6EE609E073B6",
+        },
       });
     }));
 
@@ -266,16 +255,15 @@ describe("MetaDataQueries", () => {
       name: "TimeTName",
       eTag: "00000000-0000-0000-0000-000000000000", //eTag Guid.Empty
       definedBy: TransformDefinitionType.System,
-      type: TransformType.SimpleShift
+      type: TransformType.SimpleShift,
     }).then(() => {
-      expect(
-        getMoxiosUrl()
-          .url.split("/")
-          .slice(-2)
-      ).toEqual(["timetransform", "entity"]);
+      expect(getMoxiosUrl().url.split("/").slice(-2)).toEqual([
+        "timetransform",
+        "entity",
+      ]);
       expect(getMoxiosUrl().method).toEqual("post");
       expect(getMoxiosUrl()).toMatchObject({
-        headers: { "x-api-key": "5418B0DB-7AB9-4875-81BA-6EE609E073B6" }
+        headers: { "x-api-key": "5418B0DB-7AB9-4875-81BA-6EE609E073B6" },
       });
     }));
 
@@ -285,23 +273,23 @@ describe("MetaDataQueries", () => {
       name: "TimeTName",
       eTag: "00000000-0000-0000-0000-000000000000",
       definedBy: TransformDefinitionType.User,
-      type: TransformType.SimpleShift
+      type: TransformType.SimpleShift,
     }).then(() => {
-      expect(
-        getMoxiosUrl()
-          .url.split("/")
-          .slice(-3)
-      ).toEqual(["timetransform", "entity", "1"]);
+      expect(getMoxiosUrl().url.split("/").slice(-3)).toEqual([
+        "timetransform",
+        "entity",
+        "1",
+      ]);
       expect(getMoxiosUrl().method).toEqual("put");
     }));
 
   test("Delete Time Transform ", () =>
     mds.TimeTransform.Delete(1).then(() => {
-      expect(
-        getMoxiosUrl()
-          .url.split("/")
-          .slice(-3)
-      ).toEqual(["timetransform", "entity", "1"]);
+      expect(getMoxiosUrl().url.split("/").slice(-3)).toEqual([
+        "timetransform",
+        "entity",
+        "1",
+      ]);
       expect(getMoxiosUrl().method).toEqual("delete");
     }));
   //#endregion
@@ -311,13 +299,9 @@ describe("MetaDataQueries", () => {
     mds.CustomFilter.Create({
       id: 1,
       name: "TestName",
-      searchText: "Text"
+      searchText: "Text",
     }).then(() => {
-      expect(
-        getMoxiosUrl()
-          .url.split("/")
-          .slice(-1)
-      ).toEqual(["filter"]);
+      expect(getMoxiosUrl().url.split("/").slice(-1)).toEqual(["filter"]);
       expect(getMoxiosUrl().method).toEqual("post");
     }));
 
@@ -325,43 +309,27 @@ describe("MetaDataQueries", () => {
     mds.CustomFilter.Update(1, {
       id: 1,
       name: "TestName",
-      searchText: "Text"
+      searchText: "Text",
     }).then(() => {
-      expect(
-        getMoxiosUrl()
-          .url.split("/")
-          .slice(-2)
-      ).toEqual(["filter", "1"]);
+      expect(getMoxiosUrl().url.split("/").slice(-2)).toEqual(["filter", "1"]);
       expect(getMoxiosUrl().method).toEqual("put");
     }));
 
   test("Remove Filter", () =>
     mds.CustomFilter.Delete(1).then(() => {
-      expect(
-        getMoxiosUrl()
-          .url.split("/")
-          .slice(-2)
-      ).toEqual(["filter", "1"]);
+      expect(getMoxiosUrl().url.split("/").slice(-2)).toEqual(["filter", "1"]);
       expect(getMoxiosUrl().method).toEqual("delete");
     }));
 
   test("Read Filter by id", () =>
     mds.CustomFilter.GetById(1).then(() => {
-      expect(
-        getMoxiosUrl()
-          .url.split("/")
-          .slice(-2)
-      ).toEqual(["filter", "1"]);
+      expect(getMoxiosUrl().url.split("/").slice(-2)).toEqual(["filter", "1"]);
       expect(getMoxiosUrl().method).toEqual("get");
     }));
 
   test("Read Filters", () =>
     mds.CustomFilter.Get(1, 1).then(() => {
-      expect(
-        getMoxiosUrl()
-          .url.split("/")
-          .slice(-1)
-      ).toEqual(["filter"]);
+      expect(getMoxiosUrl().url.split("/").slice(-1)).toEqual(["filter"]);
       expect(getMoxiosUrl().method).toEqual("get");
     }));
   //#endregion
@@ -369,11 +337,7 @@ describe("MetaDataQueries", () => {
   //#region ACL
   test("Read Roles by Path", () =>
     mds.Acl.ReadRolesByPath("path1").then(() => {
-      expect(
-        getMoxiosUrl()
-          .url.split("/")
-          .slice(-2)
-      ).toEqual(["me", "path1"]);
+      expect(getMoxiosUrl().url.split("/").slice(-2)).toEqual(["me", "path1"]);
     }));
 
   test("Get Roles", () =>
@@ -382,8 +346,8 @@ describe("MetaDataQueries", () => {
         qs: {
           page: "1",
           pageSize: "1",
-          principalIds: "principles"
-        }
+          principalIds: "principles",
+        },
       });
     }));
 
@@ -396,16 +360,12 @@ describe("MetaDataQueries", () => {
           inherritedFrom: "InheritedFrom",
           principal: {
             principalType: PrincipalType.User,
-            principalId: "ID"
-          }
-        }
-      ]
+            principalId: "ID",
+          },
+        },
+      ],
     }).then(() => {
-      expect(
-        getMoxiosUrl()
-          .url.split("/")
-          .slice(-2)
-      ).toEqual(["acl", "roles"]);
+      expect(getMoxiosUrl().url.split("/").slice(-2)).toEqual(["acl", "roles"]);
       expect(getMoxiosUrl().method).toEqual("post");
     }));
 
@@ -418,16 +378,12 @@ describe("MetaDataQueries", () => {
           inherritedFrom: "InheritedFrom",
           principal: {
             principalType: PrincipalType.User,
-            principalId: "ID"
-          }
-        }
-      ]
+            principalId: "ID",
+          },
+        },
+      ],
     }).then(() => {
-      expect(
-        getMoxiosUrl()
-          .url.split("/")
-          .slice(-1)
-      ).toEqual(["acl"]);
+      expect(getMoxiosUrl().url.split("/").slice(-1)).toEqual(["acl"]);
       expect(getMoxiosUrl().method).toEqual("post");
     }));
 
@@ -440,16 +396,12 @@ describe("MetaDataQueries", () => {
           inherritedFrom: "InheritedFrom",
           principal: {
             principalType: PrincipalType.User,
-            principalId: "ID"
-          }
-        }
-      ]
+            principalId: "ID",
+          },
+        },
+      ],
     }).then(() => {
-      expect(
-        getMoxiosUrl()
-          .url.split("/")
-          .slice(-2)
-      ).toEqual(["acl", "roles"]);
+      expect(getMoxiosUrl().url.split("/").slice(-2)).toEqual(["acl", "roles"]);
       expect(getMoxiosUrl().method).toEqual("delete");
     }));
   //#endregion
@@ -460,56 +412,36 @@ describe("MetaDataQueries", () => {
       id: 1,
       name: "AuthGroupTest",
       eTag: undefined,
-      users: undefined
+      users: undefined,
     }).then(() => {
-      expect(
-        getMoxiosUrl()
-          .url.split("/")
-          .slice(-1)
-      ).toEqual(["group"]);
+      expect(getMoxiosUrl().url.split("/").slice(-1)).toEqual(["group"]);
       expect(getMoxiosUrl().method).toEqual("post");
     }));
 
   test("Update Auth Group", () =>
     mds.Admin.UpdateAuthGroup(1, {
       id: 1,
-      name: "AuthGroupTest"
+      name: "AuthGroupTest",
     }).then(() => {
-      expect(
-        getMoxiosUrl()
-          .url.split("/")
-          .slice(-2)
-      ).toEqual(["group", "1"]);
+      expect(getMoxiosUrl().url.split("/").slice(-2)).toEqual(["group", "1"]);
       expect(getMoxiosUrl().method).toEqual("put");
     }));
 
   test("Remove Auth Group", () =>
     mds.Admin.RemoveAuthGroup(1).then(() => {
-      expect(
-        getMoxiosUrl()
-          .url.split("/")
-          .slice(-2)
-      ).toEqual(["group", "1"]);
+      expect(getMoxiosUrl().url.split("/").slice(-2)).toEqual(["group", "1"]);
       expect(getMoxiosUrl().method).toEqual("delete");
     }));
 
   test("Read Auth Group by Id", () =>
     mds.Admin.ReadAuthGroup(1).then(() => {
-      expect(
-        getMoxiosUrl()
-          .url.split("/")
-          .slice(-2)
-      ).toEqual(["group", "1"]);
+      expect(getMoxiosUrl().url.split("/").slice(-2)).toEqual(["group", "1"]);
       expect(getMoxiosUrl().method).toEqual("get");
     }));
 
   test("Read Auth Group by Id", () =>
     mds.Admin.ReadAuthGroups(1, 1).then(() => {
-      expect(
-        getMoxiosUrl()
-          .url.split("/")
-          .slice(-1)
-      ).toEqual(["group"]);
+      expect(getMoxiosUrl().url.split("/").slice(-1)).toEqual(["group"]);
       expect(getMoxiosUrl().method).toEqual("get");
     }));
   //#endregion
@@ -518,53 +450,50 @@ describe("MetaDataQueries", () => {
 
   test("Create Api key", () =>
     mds.ApiKey.Create({
-      id: 0
+      id: 0,
     }).then(() => {
-      expect(
-        getMoxiosUrl()
-          .url.split("/")
-          .slice(-2)
-      ).toEqual(["apikey", "entity"]);
+      expect(getMoxiosUrl().url.split("/").slice(-2)).toEqual([
+        "apikey",
+        "entity",
+      ]);
       expect(getMoxiosUrl().method).toEqual("post");
     }));
 
   test("Read Api key by Id", () =>
     mds.ApiKey.GetById(1).then(() => {
-      expect(
-        getMoxiosUrl()
-          .url.split("/")
-          .slice(-3)
-      ).toEqual(["apikey", "entity", "1"]);
+      expect(getMoxiosUrl().url.split("/").slice(-3)).toEqual([
+        "apikey",
+        "entity",
+        "1",
+      ]);
       expect(getMoxiosUrl().method).toEqual("get");
     }));
 
   test("Read Api key by Key", () =>
     mds.ApiKey.GetByKey("testKey").then(() => {
-      expect(
-        getMoxiosUrl()
-          .url.split("/")
-          .slice(-2)
-      ).toEqual(["apikey", "entity"]);
+      expect(getMoxiosUrl().url.split("/").slice(-2)).toEqual([
+        "apikey",
+        "entity",
+      ]);
       expect(getMoxiosUrl().method).toEqual("get");
     }));
 
   test("Read Api key by userId", () =>
     mds.ApiKey.GetByUserId(1, 1, "testName").then(() => {
-      expect(
-        getMoxiosUrl()
-          .url.split("/")
-          .slice(-2)
-      ).toEqual(["apikey", "entity"]);
+      expect(getMoxiosUrl().url.split("/").slice(-2)).toEqual([
+        "apikey",
+        "entity",
+      ]);
       expect(getMoxiosUrl().method).toEqual("get");
     }));
 
   test("Delete Api key", () =>
     mds.ApiKey.Delete(1).then(() => {
-      expect(
-        getMoxiosUrl()
-          .url.split("/")
-          .slice(-3)
-      ).toEqual(["apikey", "entity", "1"]);
+      expect(getMoxiosUrl().url.split("/").slice(-3)).toEqual([
+        "apikey",
+        "entity",
+        "1",
+      ]);
       expect(getMoxiosUrl().method).toEqual("delete");
     }));
 
@@ -574,14 +503,14 @@ describe("MetaDataQueries", () => {
     moxios.stubRequest(/.*/, {
       status: 422,
       statusText: "no good",
-      response: { message: "lel" }
+      response: { message: "lel" },
     });
     const mds = MarketDataService.FromApiKey({
       baseUrl: "fake",
       key: "lulz",
-      retryOptions: { delayRate: 1, times: 1 }
+      retryOptions: { delayRate: 1, times: 1 },
     });
-    await mds.client.get("fake").catch(x => x);
+    await mds.client.get("fake").catch((x) => x);
     expect(moxios.requests.count()).toEqual(2);
   });
   test("Has Circuit Breaker", async () => {
@@ -590,26 +519,26 @@ describe("MetaDataQueries", () => {
     moxios.stubRequest(/.*/, {
       status: 422,
       statusText: "no good",
-      response: { message: "lel" }
+      response: { message: "lel" },
     });
 
     const mds = MarketDataService.FromApiKey({
       baseUrl: "fake",
       key: "lulz",
-      retryOptions: { delayRate: 1, times: 3 }
+      retryOptions: { delayRate: 1, times: 3 },
     });
     await expect(
-      mds.client.get("fake").catch(x => {
+      mds.client.get("fake").catch((x) => {
         throw x.response.statusText;
       })
     ).rejects.toEqual("no good");
     await expect(
-      mds.client.get("fake").catch(x => {
+      mds.client.get("fake").catch((x) => {
         throw x.response.statusText;
       })
     ).rejects.toEqual("no good");
     await expect(
-      mds.client.get("fake").catch(x => {
+      mds.client.get("fake").catch((x) => {
         throw x.response.statusText;
       })
     ).rejects.toEqual("no good");

@@ -1,5 +1,4 @@
 import { validateUpsertCurveData } from './../../Common/validators';
-import { MarketAssessmentValue } from './MarketDataService.UpsertCurve';
 import { AxiosInstance } from "axios";
 import { MarketDataIdentifier } from "./MarketDataService.MarketData";
 
