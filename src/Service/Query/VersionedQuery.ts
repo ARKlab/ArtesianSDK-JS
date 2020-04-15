@@ -1,9 +1,9 @@
 import * as R from "ramda";
-import * as Q from "./Query";
+import * as Q from "./QueryWithExtractionInterval";
 import {
   VersionedQueryParams,
   VersionSelectionType,
-  getCurveSelectionParams,
+  getCurveSelectionParamsWithInterval,
   addTimeTransformQueryParam,
   LastOfType,
   ExtractionRangeType,
@@ -17,7 +17,7 @@ import {
 } from "./Data/Response";
 import { Granularity } from "../../Data/Enums";
 
-export class VersionedQuery extends Q.Query {
+export class VersionedQuery extends Q.QueryWithExtractionInterval {
   _queryParams: Partial<VersionedQueryParams>;
   /**
    * Set the granularity of the extracted marketdata
@@ -216,7 +216,7 @@ function buildVersionRoute(q: VersionedQueryParams): string {
 function getUrlQueryParams(q: VersionedQueryParams): string {
   return [
     Q.getUrlQueryParams(q),
-    getCurveSelectionParams(q),
+    getCurveSelectionParamsWithInterval(q),
     addTimeTransformQueryParam(q)
   ]
     .filter(Boolean)

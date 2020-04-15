@@ -75,6 +75,14 @@ export enum DayOfWeek
     Sunday = 7
 }
 /**
+ * AuctionSide Enum
+ */
+export enum AuctionSide
+{
+    Bid = 0,
+    Offer = 1
+}
+/**
  * DateString of type string
  */
 export type DateString = string;

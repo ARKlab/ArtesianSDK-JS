@@ -5,6 +5,7 @@ import {
   queryOptions
 } from "../../Data/ArtesianServiceConfig";
 import { ActualQuery } from "./ActualQuery";
+import { AuctionQuery } from './AuctionQuery';
 import * as VQ from "./VersionedQuery";
 import { MasQuery } from "./MasQuery";
 import { QueryRoute, QueryVersion } from "./Data/Constants";
@@ -36,6 +37,15 @@ class QueryService {
    */
   CreateActual() {
     return new ActualQuery(
+      this.client,
+      this.cfg.paritionStrategy || IdPartitionStrategy(this.cfg)
+    );
+  }
+    /**
+   * Create Auction Time Serie Query
+   */
+  CreateAuction() {
+    return new AuctionQuery(
       this.client,
       this.cfg.paritionStrategy || IdPartitionStrategy(this.cfg)
     );

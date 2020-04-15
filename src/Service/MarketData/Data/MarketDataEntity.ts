@@ -43,7 +43,8 @@ export type TimeTransform = {
 export enum MarketDataType {
   ActualTimeSerie,
   VersionedTimeSerie,
-  MarketAssessment
+  MarketAssessment,
+  AuctionTimeSerie
 }
 /**
  * Aggregation Rule Enums

@@ -1,3 +1,4 @@
+import { AuctionTimeSerie } from './AuctionTimeSerie';
 import { MarketDataService } from "../Service/MarketData/MarketDataService";
 import {
   Output,
@@ -45,7 +46,8 @@ export class MarketData {
   }
 
   isTrue(conditionOne: boolean, conditionTwo: boolean): boolean {
-    if (conditionOne == true || conditionTwo == true) {
+    if (conditionOne == true || conditionTwo == true) 
+    {
       return true;
     }
     return false;
@@ -170,6 +172,20 @@ export class MarketData {
     }
 
     var mas = new MarketAssessment(marketData);
+    
     return mas;
+  }
+
+  editAuction(marketData: MarketData) {
+    if (this._entity == null) {
+      throw new Error("Auction Time Series is not yet registered");
+    }
+    if (this._entity.type != MarketDataType.AuctionTimeSerie) {
+      throw new Error("Entity is not an Auction Time Serie");
+    }
+
+    var auction = new AuctionTimeSerie(marketData);
+
+    return auction;
   }
 }

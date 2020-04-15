@@ -1,8 +1,8 @@
 import * as R from "ramda";
-import * as Q from "./Query";
+import * as Q from "./QueryWithExtractionInterval";
 import {
   ActualQueryParams,
-  getCurveSelectionParams,
+  getCurveSelectionParamsWithInterval,
   addTimeTransformQueryParam
 } from "./Data/Query";
 import { ActualRow, InternalActualRow, actualMapper } from "./Data/Response";
@@ -16,7 +16,7 @@ function validateGranularity(
   return Promise.resolve(q as ActualQueryParams);
 }
 
-export class ActualQuery extends Q.Query {
+export class ActualQuery extends Q.QueryWithExtractionInterval {
   _queryParams: Partial<ActualQueryParams>;
   /**
    * Set the granularity of the extracted marketdata
@@ -64,7 +64,7 @@ function buildUrl(q: ActualQueryParams): string {
 function getUrlQueryParams(q: ActualQueryParams): string {
   return [
     Q.getUrlQueryParams(q),
-    getCurveSelectionParams(q),
+    getCurveSelectionParamsWithInterval(q),
     addTimeTransformQueryParam(q)
   ]
     .filter(Boolean)
