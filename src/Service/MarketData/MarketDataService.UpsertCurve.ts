@@ -1,5 +1,5 @@
-import { AuctionBids } from './../../Factory/AuctionTimeSerie';
-import { validateUpsertCurveData } from './../../Common/validators';
+import { AuctionBids } from "./../../Factory/AuctionTimeSerie";
+import { validateUpsertCurveData } from "./../../Common/validators";
 import { AxiosInstance } from "axios";
 import { MarketDataIdentifier } from "./MarketDataService.MarketData";
 
@@ -19,8 +19,7 @@ export class UpsertCurve {
    * @param data An object that rappresent MarketDataAssessment, ActualTimeSerie or VersionedTimeSerie
    */
   UpsertCurevData(data: UpsertCurveData) {
-
-    validateUpsertCurveData(data)
+    validateUpsertCurveData(data);
 
     const url = "marketdata/upsertdata";
 
@@ -28,16 +27,17 @@ export class UpsertCurve {
   }
 }
 
+type DateTime = string;
 export type UpsertCurveData = {
   id: MarketDataIdentifier;
   version?: Date;
   timezone: string;
   downloadedAt: Date;
-  marketAssessment?: Record<string, Record<string,MarketAssessmentValue>>;
-  rows?: Map<Date,number | undefined>;
+  marketAssessment?: Record<string, Record<string, MarketAssessmentValue>>;
+  rows?: Array<{ Key: DateTime; Value?: number }>;
   deferCommandExecution?: boolean;
   deferDataGeneration?: boolean;
-  auctionRows?: Map<Date, AuctionBids>;
+  auctionRows?: Array<{ Key: DateTime; Value: AuctionBids }>;
 };
 
 export type MarketAssessmentValue = {
@@ -50,4 +50,3 @@ export type MarketAssessmentValue = {
   volueGiven?: number;
   volume?: number;
 };
-
