@@ -6,6 +6,7 @@ import { MarketData } from "./MarketData";
 import { AddTimeSerieOperationResult } from "../Data/Enums";
 import { IsTimeGranularity, MapTimePeriod, MapDatePeriod, atMidnight } from "../Common/ArtesianUtils";
 import { IsStartOfIntervalDate, IsStartOfIntervalTime } from "../Common/Intervals";
+import * as L from "luxon";
 
 export class VersionedTimeSerie{
     _marketDataService: MarketDataService;
@@ -105,7 +106,7 @@ export class VersionedTimeSerie{
                     version: this.SelectedVersion,
                     timezone: IsTimeGranularity(this._entity.originalGranularity) ? "UTC" : this._entity.originalTimezone,
                     downloadedAt: downloadedAt,
-                    rows: this._values,
+                    rows: MapToMarketData(this._values),
                     deferCommandExecution: deferCommandExecution,
                     deferDataGeneration: deferDataGeneration
                 })
@@ -117,3 +118,15 @@ export class VersionedTimeSerie{
         }
         
     }
+
+type MarketDataEntry = { Key: string; Value?: number };
+function MapToMarketData(
+    params: Map<Date, number | undefined>
+): MarketDataEntry[] {
+    return Array.from(params.entries())
+    .map(([k, v]) => [
+        L.DateTime.fromJSDate(k).toFormat("yyyy-MM-dd'T'HH:mm:ss"),
+        v,
+    ] as const)
+    .map(([Key, Value]) => ({ Key, Value }));
+}

@@ -1,4 +1,3 @@
-import { AuctionBids } from './../Factory/AuctionTimeSerie';
 import { Input, MarketDataType, AggregationRule } from './../Service/MarketData/Data/MarketDataEntity';
 import { CustomFilter } from './../Service/MarketData/MarketDataService.CustomFilter';
 import { CharacterValidatorRegEx } from './../Data/Constants';
@@ -158,7 +157,7 @@ export const validateUpsertCurveData = (upsertCurveData:UpsertCurveData) => {
         if(upsertCurveData.version != null)
             throw new Error("UpsertCurveData Version must be NULL if Rows are NULL");
         
-        if((upsertCurveData.marketAssessment == null || countMarketAssessments(upsertCurveData.marketAssessment) == 0) && (upsertCurveData.auctionRows == null || countAuctionRows(upsertCurveData.auctionRows) == 0))
+        if((upsertCurveData.marketAssessment == null || countMarketAssessments(upsertCurveData.marketAssessment) == 0) && (upsertCurveData.auctionRows == null || upsertCurveData.auctionRows.length == 0))
             throw new Error("UpsertCurveData MarketAssessment/Bids must be valorized if Rows are NULL");
     }
     else
@@ -183,7 +182,7 @@ export const validateUpsertCurveData = (upsertCurveData:UpsertCurveData) => {
 
     if(upsertCurveData.marketAssessment == null)
     {
-        if ((upsertCurveData.rows == null || upsertCurveData.rows.size == 0) && (upsertCurveData.auctionRows == null || countAuctionRows(upsertCurveData.auctionRows) == 0))
+        if ((upsertCurveData.rows == null || upsertCurveData.rows.length == 0) && (upsertCurveData.auctionRows == null || upsertCurveData.auctionRows.length == 0))
             throw new Error("UpsertCurveData Rows/Bids must be valorized if MarketAssesment are NULL");
     }
     else
@@ -197,7 +196,7 @@ export const validateUpsertCurveData = (upsertCurveData:UpsertCurveData) => {
 
     if (upsertCurveData.auctionRows == null)
     {
-        if ((upsertCurveData.rows == null || upsertCurveData.rows.size == 0) && (upsertCurveData.marketAssessment == null || countMarketAssessments(upsertCurveData.marketAssessment) == 0))
+        if ((upsertCurveData.rows == null || upsertCurveData.rows.length == 0) && (upsertCurveData.marketAssessment == null || countMarketAssessments(upsertCurveData.marketAssessment) == 0))
             throw new Error("UpsertCurveData Rows/MarketAssessment must be valorized if Bids are NULL");
     }
     else
@@ -229,7 +228,7 @@ export const countMarketAssessments = (record: Record<string, Record<string,Mark
  * Count of AuctionRows
  * @param record 
  */
-export const countAuctionRows = (record: Map<Date, AuctionBids>) => {
+export const countAuctionRows = (record: {}[]) => {
     var count = 0;
 
     for(let key of record){

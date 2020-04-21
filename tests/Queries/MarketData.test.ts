@@ -1,4 +1,3 @@
-import { getUTCDate } from "./../../src/Common/ArtesianUtils";
 import { PrincipalType } from "../../src/Service/MarketData/MarketDataService.Acl";
 import {
   TransformDefinitionType,
@@ -182,8 +181,7 @@ describe("MetaDataQueries", () => {
       version: new Date(2018, 8, 19, 12, 0, 0, 123),
       timezone: "CET",
       downloadedAt: new Date(),
-      //rows: { "Sun Aug 19 2018 12:00:00 GMT+0100 (Irish Standard Time)": 21.4 }, deferCommandExecution: false,
-      rows: new Map([[getUTCDate(new Date(2018, 1, 1, 0, 0)), 21.4]]),
+      rows: [{Key: "Date", Value: 21.4}],
       deferDataGeneration: true,
     }).then(() => {
       expect(getMoxiosUrl().url.split("/").slice(-2)).toEqual([
@@ -212,7 +210,7 @@ describe("MetaDataQueries", () => {
       id: { provider: "TestProviderName", name: "TestCurveName" },
       timezone: "CET",
       downloadedAt: new Date(),
-      rows: new Map([[getUTCDate(new Date(2018, 8, 19, 12, 0, 0, 0)), 21.4]]),
+      rows: [{Key:"Date", Value:21.4}],
     }).then(() => {
       expect(getMoxiosUrl().url.split("/").slice(-2)).toEqual([
         "marketdata",

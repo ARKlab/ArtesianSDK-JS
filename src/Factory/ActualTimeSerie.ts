@@ -7,6 +7,7 @@ import { MarketData } from  "./MarketData";
 import { AddTimeSerieOperationResult } from "../Data/Enums";
 import { IsTimeGranularity, MapTimePeriod, MapDatePeriod} from "../Common/ArtesianUtils";
 import { IsStartOfIntervalDate, IsStartOfIntervalTime } from "../Common/Intervals";
+import * as L from "luxon";
 
 export class ActualTimeSerie{
     _marketDataService: MarketDataService;
@@ -93,7 +94,7 @@ export class ActualTimeSerie{
                     id: this._identifier,
                     timezone: IsTimeGranularity(this._entity.originalGranularity) ? "UTC" : this._entity.originalTimezone,
                     downloadedAt: downloadedAt,
-                    rows: this._values,
+                    rows: MapToMarketData(this._values),
                     deferCommandExecution: deferCommandExecution,
                     deferDataGeneration: deferDataGeneration
                 })
@@ -104,3 +105,15 @@ export class ActualTimeSerie{
             //    _logger.Warn("No Data to be saved.");
         }
     }
+
+type MarketDataEntry = { Key: string; Value?: number };
+function MapToMarketData(
+    params: Map<Date, number | undefined>
+): MarketDataEntry[] {
+    return Array.from(params.entries())
+    .map(([k, v]) => [
+        L.DateTime.fromJSDate(k).toFormat("yyyy-MM-dd'T'HH:mm:ss"),
+        v,
+    ] as const)
+    .map(([Key, Value]) => ({ Key, Value }));
+}
