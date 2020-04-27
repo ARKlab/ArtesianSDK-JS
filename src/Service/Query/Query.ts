@@ -49,6 +49,9 @@ export class Query {
    * @param end end date
    */
   InAbsoluteDateRange(start: Date, end: Date) {
+    if(start >= end)
+      throw new Error("End date must be greater than start date");
+
     this._queryParams.extractionRange = {
       tag: ExtractionRangeType.DateRange,
       start: start,

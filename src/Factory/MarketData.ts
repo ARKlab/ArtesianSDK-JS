@@ -110,10 +110,6 @@ export class MarketData {
   }
 
   async load() {
-    //@ts-ignore
-    var gimme = (await this._marketDataService.MarketData.ReadMarketDataRegistry(
-      this.identifier
-    ))
     this._entity = (await this._marketDataService.MarketData.ReadMarketDataRegistry(
       this.identifier
     ));
