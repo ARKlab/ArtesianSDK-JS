@@ -27,38 +27,38 @@ test("MarketData Factory actual time series", async () => {
   moxios.uninstall();
   moxios.install();
   let x: Output = {
-    marketDataId: 0,
-    providerName: "TestProvider",
-    marketDataName: "TestMarketDataName",
-    originalGranularity: Granularity.Day,
-    type: MarketDataType.ActualTimeSerie,
-    originalTimezone: "CET",
-    aggregationRule: AggregationRule.AverageAndReplicate,
-    transform: {
+    MarketDataId: 0,
+    ProviderName: "TestProvider",
+    MarketDataName: "TestMarketDataName",
+    OriginalGranularity: Granularity.Day,
+    Type: MarketDataType.ActualTimeSerie,
+    OriginalTimezone: "CET",
+    AggregationRule: AggregationRule.AverageAndReplicate,
+    Transform: {
       id: 1,
       name: "TimeTName",
       eTag: "00000000-0000-0000-0000-000000000000",
       definedBy: TransformDefinitionType.System,
       type: TransformType.SimpleShift
     },
-    lastUpdated: new Date(),
-    created: new Date()
+    LastUpdated: new Date(),
+    Created: new Date()
   };
 
-  moxios.stubRequest(/.*/, { response: { data: x } });
+  moxios.stubRequest(/.*/, { response: x });
   var marketDataEntity: Input = {
-    marketDataId: 0,
-    providerName: "TestProvider",
-    marketDataName: "TestMarketData",
-    originalGranularity: Granularity.Day,
-    type: MarketDataType.ActualTimeSerie,
-    originalTimezone: "CET",
-    aggregationRule: AggregationRule.Undefined
+    MarketDataId: 0,
+    ProviderName: "TestProvider",
+    MarketDataName: "TestMarketData",
+    OriginalGranularity: Granularity.Day,
+    Type: MarketDataType.ActualTimeSerie,
+    OriginalTimezone: "CET",
+    AggregationRule: AggregationRule.Undefined
   };
 
   var marketData = mds.MarketDataServiceExtensions.getMarketDataReference(mds, {
-    provider: marketDataEntity.providerName,
-    name: marketDataEntity.marketDataName
+    provider: marketDataEntity.ProviderName,
+    name: marketDataEntity.MarketDataName
   });
 
   await marketData.Register(marketDataEntity);
@@ -94,38 +94,38 @@ test("MarketData Factory auction time series", async () => {
   moxios.uninstall();
   moxios.install();
   let x: Output = {
-    marketDataId: 0,
-    providerName: "TestProvider",
-    marketDataName: "TestMarketDataName",
-    originalGranularity: Granularity.Day,
-    type: MarketDataType.AuctionTimeSerie,
-    originalTimezone: "CET",
-    aggregationRule: AggregationRule.AverageAndReplicate,
-    transform: {
+    MarketDataId: 0,
+    ProviderName: "TestProvider",
+    MarketDataName: "TestMarketDataName",
+    OriginalGranularity: Granularity.Day,
+    Type: MarketDataType.AuctionTimeSerie,
+    OriginalTimezone: "CET",
+    AggregationRule: AggregationRule.AverageAndReplicate,
+    Transform: {
       id: 1,
       name: "TimeTName",
       eTag: "00000000-0000-0000-0000-000000000000",
       definedBy: TransformDefinitionType.System,
       type: TransformType.SimpleShift
     },
-    lastUpdated: new Date(),
-    created: new Date()
+    LastUpdated: new Date(),
+    Created: new Date()
   };
 
-  moxios.stubRequest(/.*/, { response: { data: x } });
+  moxios.stubRequest(/.*/, { response: x });
   var marketDataEntity: Input = {
-    marketDataId: 0,
-    providerName: "TestProvider",
-    marketDataName: "TestMarketData",
-    originalGranularity: Granularity.Day,
-    type: MarketDataType.AuctionTimeSerie,
-    originalTimezone: "CET",
-    aggregationRule: AggregationRule.Undefined
+    MarketDataId: 0,
+    ProviderName: "TestProvider",
+    MarketDataName: "TestMarketData",
+    OriginalGranularity: Granularity.Day,
+    Type: MarketDataType.AuctionTimeSerie,
+    OriginalTimezone: "CET",
+    AggregationRule: AggregationRule.Undefined
   };
 
   var marketData = mds.MarketDataServiceExtensions.getMarketDataReference(mds, {
-    provider: marketDataEntity.providerName,
-    name: marketDataEntity.marketDataName
+    provider: marketDataEntity.ProviderName,
+    name: marketDataEntity.MarketDataName
   });
 
   await marketData.Register(marketDataEntity);
@@ -163,38 +163,38 @@ test("MarketData Factory versioned time series", async () => {
   moxios.uninstall();
   moxios.install();
   let x: Output = {
-    marketDataId: 0,
-    providerName: "TestProvider",
-    marketDataName: "TestMarketDataName",
-    originalGranularity: Granularity.Day,
-    type: MarketDataType.VersionedTimeSerie,
-    originalTimezone: "CET",
-    aggregationRule: AggregationRule.AverageAndReplicate,
-    transform: {
+    MarketDataId: 0,
+    ProviderName: "TestProvider",
+    MarketDataName: "TestMarketDataName",
+    OriginalGranularity: Granularity.Day,
+    Type: MarketDataType.VersionedTimeSerie,
+    OriginalTimezone: "CET",
+    AggregationRule: AggregationRule.AverageAndReplicate,
+    Transform: {
       id: 1,
       name: "TimeTName",
       eTag: "00000000-0000-0000-0000-000000000000",
       definedBy: TransformDefinitionType.System,
       type: TransformType.SimpleShift
     },
-    lastUpdated: new Date(),
-    created: new Date()
+    LastUpdated: new Date(),
+    Created: new Date()
   };
 
-  moxios.stubRequest(/.*/, { response: { data: x } });
+  moxios.stubRequest(/.*/, { response: x });
 
   var marketDataEntity: Input = {
-    marketDataId: 0,
-    providerName: "TestProvider",
-    marketDataName: "TestMarketData",
-    originalGranularity: Granularity.Day,
-    type: MarketDataType.VersionedTimeSerie,
-    originalTimezone: "CET",
-    aggregationRule: AggregationRule.Undefined
+    MarketDataId: 0,
+    ProviderName: "TestProvider",
+    MarketDataName: "TestMarketData",
+    OriginalGranularity: Granularity.Day,
+    Type: MarketDataType.VersionedTimeSerie,
+    OriginalTimezone: "CET",
+    AggregationRule: AggregationRule.Undefined
   };
   var marketData = mds.MarketDataServiceExtensions.getMarketDataReference(mds, {
-    provider: marketDataEntity.providerName,
-    name: marketDataEntity.marketDataName
+    provider: marketDataEntity.ProviderName,
+    name: marketDataEntity.MarketDataName
   });
 
   await marketData.Register(marketDataEntity);
@@ -235,38 +235,38 @@ test("MarketData Factory Market Assessment", async () => {
   moxios.uninstall();
   moxios.install();
   let x: Output = {
-    marketDataId: 0,
-    providerName: "TestProvider",
-    marketDataName: "TestMarketDataName",
-    originalGranularity: Granularity.Day,
-    type: MarketDataType.MarketAssessment,
-    originalTimezone: "CET",
-    aggregationRule: AggregationRule.Undefined,
-    transform: {
+    MarketDataId: 0,
+    ProviderName: "TestProvider",
+    MarketDataName: "TestMarketDataName",
+    OriginalGranularity: Granularity.Day,
+    Type: MarketDataType.MarketAssessment,
+    OriginalTimezone: "CET",
+    AggregationRule: AggregationRule.Undefined,
+    Transform: {
       id: 1,
       name: "TimeTName",
       eTag: "00000000-0000-0000-0000-000000000000",
       definedBy: TransformDefinitionType.System,
       type: TransformType.SimpleShift
     },
-    lastUpdated: new Date(),
-    created: new Date()
+    LastUpdated: new Date(),
+    Created: new Date()
   };
 
-  moxios.stubRequest(/.*/, { response: { data: x } });
+  moxios.stubRequest(/.*/, { response: x });
 
   var marketDataEntity: Input = {
-    marketDataId: 0,
-    providerName: "TestProvider",
-    marketDataName: "TestMarketData",
-    originalGranularity: Granularity.Day,
-    type: MarketDataType.MarketAssessment,
-    originalTimezone: "CET",
-    aggregationRule: AggregationRule.Undefined
+    MarketDataId: 0,
+    ProviderName: "TestProvider",
+    MarketDataName: "TestMarketData",
+    OriginalGranularity: Granularity.Day,
+    Type: MarketDataType.MarketAssessment,
+    OriginalTimezone: "CET",
+    AggregationRule: AggregationRule.Undefined
   };
   var marketData = mds.MarketDataServiceExtensions.getMarketDataReference(mds, {
-    provider: marketDataEntity.providerName,
-    name: marketDataEntity.marketDataName
+    provider: marketDataEntity.ProviderName,
+    name: marketDataEntity.MarketDataName
   });
 
   await marketData.Register(marketDataEntity);

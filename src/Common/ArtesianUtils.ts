@@ -1,5 +1,6 @@
 import * as R from "ramda";
 import { Granularity, TimePeriod, DatePeriod } from "./../Data/Enums";
+import * as L from "luxon";
 
 /**
  * Returns true if the given Granularity is by time
@@ -152,10 +153,7 @@ export function createDeferred(): [Promise<void>, resolver, resolver] {
 }
 
 const paging = R.uncurryN(3, (size: number) => (page: number) =>
-  R.pipe(
-    R.drop(page * size),
-    R.take(size)
-  )
+  R.pipe(R.drop(page * size), R.take(size))
 );
 
 const defaultPartition = 25;
@@ -164,10 +162,61 @@ export const partitionIds = (
   cfg = { partitionSize: defaultPartition }
 ) => {
   return R.unfold(
-    i =>
+    (i) =>
       ids.length <= i * cfg.partitionSize
         ? false
         : [paging(cfg.partitionSize, i, ids), i + 1],
     0
   );
 };
+
+export function IsStartOfInterval(
+  date: Date,
+  granularity: Granularity
+): boolean {
+  const datetime = L.DateTime.fromJSDate(date);
+
+  switch (granularity) {
+    case Granularity.Minute:
+      return datetime.equals(datetime.startOf("minute"));
+    case Granularity.TenMinute:
+      return (
+        datetime.minute % 10 == 0 && datetime.equals(datetime.startOf("minute"))
+      );
+    case Granularity.FifteenMinute:
+      return (
+        datetime.minute % 15 == 0 && datetime.equals(datetime.startOf("minute"))
+      );
+    case Granularity.ThirtyMinute:
+      return (
+        datetime.minute % 30 == 0 && datetime.equals(datetime.startOf("minute"))
+      );
+    case Granularity.Hour:
+      return datetime.equals(datetime.startOf("hour"));
+    case Granularity.Day:
+      return datetime.equals(datetime.startOf("day"));
+    case Granularity.Week:
+      return datetime.equals(datetime.startOf("week"));
+    case Granularity.Month:
+      return datetime.equals(datetime.startOf("month"));
+    case Granularity.Quarter:
+      return datetime.equals(datetime.startOf("quarter"));
+    case Granularity.Year:
+      return datetime.equals(datetime.startOf("year"));
+  }
+}
+
+type MarketDataEntry = { Key: string; Value?: number };
+export function MapToMarketData(
+  params: Map<Date, number | undefined>
+): MarketDataEntry[] {
+  return Array.from(params.entries())
+    .map(
+      ([k, v]) =>
+        [toDateString(k), v] as const
+    )
+    .map(([Key, Value]) => ({ Key, Value }));
+}
+
+export const toDateString = (d: Date) =>
+  L.DateTime.fromJSDate(d).toFormat("yyyy-MM-dd'T'HH:mm:ss");

@@ -7,10 +7,23 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Program",
+      "name": "Launch Runner",
       "program": "${workspaceFolder}\\runner\\dist\\runner\\src\\index.js",
-      "outFiles": ["${workspaceFolder}/runner/**/*.js"],
-      "preLaunchTask": "build:runner"
+      "outFiles": ["${workspaceFolder}/runner/dist/**/*.js"],
+      "preLaunchTask": "build:runner",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Debug Jest Tests",
+      "type": "node",
+      "request": "launch",
+      "port": 9229,
+      "runtimeArgs": [
+        "--inspect-brk",
+        "${workspaceRoot}/node_modules//jest/bin/jest.js",
+        "--runInBand",
+        "--watch"
+      ]
     }
   ]
 }

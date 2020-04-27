@@ -22,7 +22,7 @@ describe("PublicOfferService", () => {
   test("FromAuthConfig", () => {
     moxios.stubRequest(/.*/, { response: { access_token: "lolz" } });
 
-    const qs = GMEPublicOfferService.FromAuthConfig({
+    const qs = GMEPublicOfferService.FromAuthConfig({ 
       baseUrl: "fake",
       clientId: "id",
       clientSecret: "sec",

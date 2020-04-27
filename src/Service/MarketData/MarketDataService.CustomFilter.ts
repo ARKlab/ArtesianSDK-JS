@@ -1,11 +1,9 @@
 import { validateCustomFilter } from './../../Common/validators';
-import { AxiosInstance } from "axios";
 import { PagedResult } from "./Data/Response";
+import { IService } from './MarketDataService';
 
 export class CustomFilterSDK {
-  _client: AxiosInstance;
-  constructor(client: AxiosInstance) {
-    this._client = client;
+  constructor(private _client: IService) {
   }
   /**
    * Create a new Filter

@@ -1,10 +1,8 @@
-import { AxiosInstance } from "axios";
 import { PagedResult } from "./Data/Response";
+import { IService } from "./MarketDataService";
 
 export class ApiKey {
-  _client: AxiosInstance;
-  constructor(client: AxiosInstance) {
-    this._client = client;
+  constructor(private _client: IService) {
   }
   /**
    * Create new ApiKey

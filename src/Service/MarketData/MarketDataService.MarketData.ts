@@ -1,4 +1,3 @@
-import { AxiosInstance } from "axios";
 import { PagedResult } from "./Data/Response";
 import { Output, Input } from "./Data/MarketDataEntity";
 import {
@@ -8,11 +7,10 @@ import {
   validateUpdateMarketDataEntity,
 } from "../../Common/validators";
 import * as L from "luxon";
+import { IService } from "./MarketDataService";
 
 export class MarketData {
-  _client: AxiosInstance;
-  constructor(client: AxiosInstance) {
-    this._client = client;
+  constructor(private _client: IService) {
   }
   /**
    * Read marketdata metadata by provider and curve name with MarketDataIdentifier
@@ -71,7 +69,7 @@ export class MarketData {
    */
   UpdateMarketData(metadata: Input) {
     validateUpdateMarketDataEntity(metadata);
-    const url = "marketdata/entity/" + metadata.marketDataId;
+    const url = "marketdata/entity/" + metadata.MarketDataId;
 
     return this._client.put<Output>(url, metadata);
   }

@@ -1,11 +1,9 @@
 import { validateSearchFilter } from './../../Common/validators';
-import { AxiosInstance } from "axios";
 import { Output } from "./Data/MarketDataEntity";
+import { IService } from './MarketDataService';
 
 export class SearchFacet {
-  _client: AxiosInstance;
-  constructor(client: AxiosInstance) {
-    this._client = client;
+  constructor(private _client: IService) {
   }
   /**
    * Search the marketdata metadata

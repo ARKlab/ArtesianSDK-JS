@@ -7,39 +7,39 @@ export class MarketDataMetadata {
         this._output = output;
     }
 
-    marketDataId = () => this._output.marketDataId;
-    eTag = () => this._output.eTag;
-    providerName = () => this._output.providerName;
-    marketDataName = () => this._output.marketDataName;
-    originalGranularity = () => this._output.originalGranularity;
-    type = () => this._output.type;
+    marketDataId = () => this._output.MarketDataId;
+    eTag = () => this._output.ETag;
+    providerName = () => this._output.ProviderName;
+    marketDataName = () => this._output.MarketDataName;
+    originalGranularity = () => this._output.OriginalGranularity;
+    type = () => this._output.Type;
 
     get originialTimezone(): string {
-        return this._output.originalTimezone;
+        return this._output.OriginalTimezone;
     }
     set originalTimezone(value: string) {
-        this._output.originalTimezone = value;
+        this._output.OriginalTimezone = value;
     }
     _aggregationRule: AggregationRule;
     get aggregationRule(): AggregationRule {
-        return this._output.aggregationRule;
+        return this._output.AggregationRule;
     }
     set aggregationRule(value: AggregationRule) {
-        this._output.aggregationRule = value;
+        this._output.AggregationRule = value;
     }
 
     get providerDescription(): string | undefined {
-        return this._output.providerDescription;
+        return this._output.ProviderDescription;
     }
     set providerDescription(value: string | undefined) {
-        this._output.providerDescription = value;
+        this._output.ProviderDescription = value;
     }
 
     get tags(): Record<string, string[]> | undefined {
-        return this._output.tags;
+        return this._output.Tags;
     }
     set tags(value: Record<string, string[]> | undefined) {
-        this._output.tags = value;
+        this._output.Tags = value;
     }
 
     _path: string;
@@ -51,17 +51,17 @@ export class MarketDataMetadata {
     }
 
     get transform(): TimeTransform {
-        return this._output.transform;
+        return this._output.Transform;
     }
     set transform(value: TimeTransform) {
-        this._output.transform = value;
-        this._output.transformId = this._output.transform.id;
+        this._output.Transform = value;
+        this._output.TransformId = this._output.Transform.id;
     }
 
-    lastUpdated = () => this._output.lastUpdated;
-    dataLastWritedAt = () => this._output.dataLastWritedAt;
-    dateRangeStart = () => this._output.dateRangeStart;
-    dateRangeEnd = () => this._output.dateRangeEnd;
-    created = () => this._output.created;
+    lastUpdated = () => this._output.LastUpdated;
+    dataLastWritedAt = () => this._output.DataLastWritedAt;
+    dateRangeStart = () => this._output.DateRangeStart;
+    dateRangeEnd = () => this._output.DateRangeEnd;
+    created = () => this._output.Created;
 
 }

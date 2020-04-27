@@ -4,8 +4,7 @@ import { Output } from "../Service/MarketData/Data/MarketDataEntity";
 import { MarketDataIdentifier } from "../Service/MarketData/MarketDataService.MarketData";
 import { MarketData } from "./MarketData";
 import { AddTimeSerieOperationResult } from "../Data/Enums";
-import { IsTimeGranularity, MapTimePeriod, MapDatePeriod, atMidnight } from "../Common/ArtesianUtils";
-import { IsStartOfIntervalDate, IsStartOfIntervalTime } from "../Common/Intervals";
+import { IsTimeGranularity, IsStartOfInterval, MapToMarketData, toDateString } from "../Common/ArtesianUtils";
 import * as L from "luxon";
 
 export class VersionedTimeSerie{
@@ -17,7 +16,7 @@ export class VersionedTimeSerie{
     constructor(marketData: MarketData){
         this._entity = marketData._entity;
         this._marketDataService = marketData._marketDataService;
-        this._identifier = ({ provider: this._entity.providerName, name: this._entity.marketDataName });
+        this._identifier = ({ provider: this._entity.ProviderName, name: this._entity.MarketDataName });
         this.Values = this._values;
     }
 
@@ -51,46 +50,36 @@ export class VersionedTimeSerie{
         if(this._entity == null){
             throw new Error("entity  null");
         }
-
-        if(IsTimeGranularity(this._entity.originalGranularity)){
-            throw new Error("This MarketData has Time granularity. Use AddData(Instant time, double? value");
-        }
-
-        var localTime = atMidnight(localDate);
-
-        return this._add(localTime, value);
+        return this._add(localDate, value);
     }
 
     private _add(localTime: Date, value?: number){
+        const utcTime = L.DateTime.fromJSDate(localTime).toUTC().toJSDate();
 
-        if (this._values.has(localTime)){
+        if (this._values.has(utcTime)){
             return AddTimeSerieOperationResult.TimeAlreadyPresent;
         }
-        var period;
 
         if (this._entity === undefined) {
             throw new Error(this._entity + " entity is undefined");
         }
 
-        if(IsTimeGranularity(this._entity.originalGranularity)){
-            period = MapTimePeriod(this._entity.originalGranularity);
-            if(!IsStartOfIntervalTime(localTime,period)){
-                throw new Error("Trying to insert Time " + localTime + " with the wrong format to serie " + this._identifier + ". Should be of period " + period);
-            }
-        }
-        else{
-            period = MapDatePeriod(this._entity.originalGranularity);
-            if(!IsStartOfIntervalDate(localTime,period)){
-                throw new Error("Trying to insert Time " + localTime + " with the wrong format to serie " + this._identifier + ". Should be of period " + period);
-            }
-        }
+        if (!IsStartOfInterval(utcTime, this._entity.OriginalGranularity))
+      throw new Error(
+        "Trying to insert Time " +
+          utcTime +
+          " with wrong format to serie " +
+          this._identifier.name +
+          ". Should be of period " +
+          this._entity.OriginalGranularity
+      );
 
-        this._values.set(localTime,value);
+        this._values.set(utcTime,value);
 
         return AddTimeSerieOperationResult.ValueAdded;
     }
 
-    Save(downloadedAt: Date, deferCommandExecution: boolean = false, deferDataGeneration: boolean = true){
+    async Save(downloadedAt: Date, deferCommandExecution: boolean = false, deferDataGeneration: boolean = true){
         if(this.SelectedVersion == null){
             throw new Error ("No version has been selected to save Data");
         }
@@ -103,30 +92,18 @@ export class VersionedTimeSerie{
             {
                 var data: UpsertCurveData = ({
                     id: this._identifier,
-                    version: this.SelectedVersion,
-                    timezone: IsTimeGranularity(this._entity.originalGranularity) ? "UTC" : this._entity.originalTimezone,
-                    downloadedAt: downloadedAt,
+                    version: toDateString(this.SelectedVersion),
+                    timezone: IsTimeGranularity(this._entity.OriginalGranularity) ? "UTC" : this._entity.OriginalTimezone,
+                    downloadedAt,
                     rows: MapToMarketData(this._values),
                     deferCommandExecution: deferCommandExecution,
                     deferDataGeneration: deferDataGeneration
                 })
         
-             this._marketDataService.UpsertCurve.UpsertCurevData(data);
+             await this._marketDataService.UpsertCurve.UpsertCurevData(data);
             }
             //else
             //    _logger.Warn("No Data to be saved.");
         }
         
     }
-
-type MarketDataEntry = { Key: string; Value?: number };
-function MapToMarketData(
-    params: Map<Date, number | undefined>
-): MarketDataEntry[] {
-    return Array.from(params.entries())
-    .map(([k, v]) => [
-        L.DateTime.fromJSDate(k).toFormat("yyyy-MM-dd'T'HH:mm:ss"),
-        v,
-    ] as const)
-    .map(([Key, Value]) => ({ Key, Value }));
-}

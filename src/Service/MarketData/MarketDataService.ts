@@ -21,6 +21,14 @@ import { RetryOptions } from "../../Common/Retry";
 import { axiosWrapper } from "../../Common/AxiosWrapper";
 import { MetadataVersion } from "../../Data/Constants";
 
+export interface IService{
+  get: <A>(url:string) => Promise<A>,
+  post: <A>(url: string, data?: any, config?: AxiosRequestConfig | undefined) => Promise<A>,
+  delete: (url:string) => Promise<any>,
+  request: <A>(config: AxiosRequestConfig) => Promise<A>,
+  put: <A>(url: string, data?: any) => Promise<A>
+}
+
 export class MarketDataService {
   client: AxiosInstance;
   Acl: Acl;
@@ -51,9 +59,7 @@ export class MarketDataService {
     this.SearchFacet = new SearchFacet(this.client);
     this.TimeTransform = new TimeTransformSDK(this.client);
     this.UpsertCurve = new UpsertCurve(this.client);
-    this.MarketDataServiceExtensions = new MarketDataServiceExtensions(
-      this.client
-    );
+    this.MarketDataServiceExtensions = new MarketDataServiceExtensions();
   }
 }
 /**

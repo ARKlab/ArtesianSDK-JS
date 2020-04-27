@@ -64,13 +64,13 @@ describe("MetaDataQueries", () => {
 
   test("Register Market Data", () =>
     mds.MarketData.RegisterMarketData({
-      marketDataId: 0,
-      providerName: "TestProvider",
-      marketDataName: "TestMarketData",
-      originalGranularity: Granularity.Day,
-      type: MarketDataType.VersionedTimeSerie,
-      originalTimezone: "CET",
-      aggregationRule: AggregationRule.Undefined,
+      MarketDataId: 0,
+      ProviderName: "TestProvider",
+      MarketDataName: "TestMarketData",
+      OriginalGranularity: Granularity.Day,
+      Type: MarketDataType.VersionedTimeSerie,
+      OriginalTimezone: "CET",
+      AggregationRule: AggregationRule.Undefined,
     }).then(() => {
       expect(getMoxiosUrl().url.split("/").slice(-2)).toEqual([
         "marketdata",
@@ -81,13 +81,13 @@ describe("MetaDataQueries", () => {
 
   test("Update Market Data", () =>
     mds.MarketData.UpdateMarketData({
-      marketDataId: 1,
-      providerName: "TestProvider",
-      marketDataName: "TestMarketData",
-      originalGranularity: Granularity.Day,
-      type: MarketDataType.VersionedTimeSerie,
-      originalTimezone: "CET",
-      aggregationRule: AggregationRule.Undefined,
+      MarketDataId: 1,
+      ProviderName: "TestProvider",
+      MarketDataName: "TestMarketData",
+      OriginalGranularity: Granularity.Day,
+      Type: MarketDataType.VersionedTimeSerie,
+      OriginalTimezone: "CET",
+      AggregationRule: AggregationRule.Undefined,
     }).then(() => {
       expect(getMoxiosUrl().url.split("/").slice(-3)).toEqual([
         "marketdata",
@@ -178,10 +178,10 @@ describe("MetaDataQueries", () => {
   test("Upsert Curve Data versioned", () =>
     mds.UpsertCurve.UpsertCurevData({
       id: { provider: "TestProviderName", name: "TestCurveName" },
-      version: new Date(2018, 8, 19, 12, 0, 0, 123),
+      version: "Date",
       timezone: "CET",
       downloadedAt: new Date(),
-      rows: [{Key: "Date", Value: 21.4}],
+      rows: [{ Key: "Date", Value: 21.4 }],
       deferDataGeneration: true,
     }).then(() => {
       expect(getMoxiosUrl().url.split("/").slice(-2)).toEqual([
@@ -196,7 +196,7 @@ describe("MetaDataQueries", () => {
       id: { provider: "TestProviderName", name: "TestCurveName" },
       timezone: "CET",
       downloadedAt: new Date(),
-      marketAssessment: { "2018-4-5": { test: {} } },
+      MarketAssessment: [{ Key: "", Value: [] }],
     }).then(() => {
       expect(getMoxiosUrl().url.split("/").slice(-2)).toEqual([
         "marketdata",
@@ -210,7 +210,7 @@ describe("MetaDataQueries", () => {
       id: { provider: "TestProviderName", name: "TestCurveName" },
       timezone: "CET",
       downloadedAt: new Date(),
-      rows: [{Key:"Date", Value:21.4}],
+      rows: [{ Key: "Date", Value: 21.4 }],
     }).then(() => {
       expect(getMoxiosUrl().url.split("/").slice(-2)).toEqual([
         "marketdata",

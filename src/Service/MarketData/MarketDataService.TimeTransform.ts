@@ -1,11 +1,9 @@
-import { AxiosInstance } from "axios";
 import { TimeTransform } from "./Data/MarketDataEntity";
 import { PagedResult } from "./Data/Response";
+import { IService } from "./MarketDataService";
 
 export class TimeTransformSDK {
-  _client: AxiosInstance;
-  constructor(client: AxiosInstance) {
-    this._client = client;
+  constructor(private _client: IService) {
   }
   /**
    * Read a time transform entity from the service by ID
