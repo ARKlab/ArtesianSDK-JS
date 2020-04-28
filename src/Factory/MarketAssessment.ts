@@ -6,7 +6,11 @@ import { MarketDataService } from "../Service/MarketData/MarketDataService";
 import { Output } from "./../Service/MarketData/Data/MarketDataEntity";
 import { MarketDataIdentifier } from "../Service/MarketData/MarketDataService.MarketData";
 import { MarketData } from "./MarketData";
-import { IsStartOfInterval, toDateString } from "../Common/ArtesianUtils";
+import {
+  IsStartOfInterval,
+  toDateString,
+  IsTimeGranularity,
+} from "../Common/ArtesianUtils";
 import { AddAssessmentOperationResult } from "../Data/Enums";
 import * as R from "ramda";
 import * as L from "luxon";
@@ -95,7 +99,9 @@ export class MarketAssessment {
     if (this.Assessments.length > 0) {
       var data: UpsertCurveData = {
         id: this._identifier,
-        timezone: this._entity.OriginalTimezone,
+        timezone: IsTimeGranularity(this._entity.OriginalGranularity)
+          ? "UTC"
+          : this._entity.OriginalTimezone,
         downloadedAt: downloadedAt,
         deferCommandExecution: deferCommandExecution,
         deferDataGeneration: deferDataGeneration,
