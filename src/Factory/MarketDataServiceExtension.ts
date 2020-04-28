@@ -3,12 +3,9 @@ import { MarketData } from "./MarketData";
 import { MarketDataService } from "../Service/MarketData/MarketDataService";
 
 export class MarketDataServiceExtensions {
-  constructor() {}
+  constructor(public marketDataService: MarketDataService) {}
 
-  getMarketDataReference(
-    marketDataService: MarketDataService,
-    id: MarketDataIdentifier
-  ): MarketData {
-    return new MarketData(marketDataService, id);
+  getMarketDataReference(id: MarketDataIdentifier): MarketData {
+    return new MarketData(this.marketDataService, id);
   }
 }

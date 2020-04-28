@@ -59,7 +59,7 @@ export class MarketDataService {
     this.SearchFacet = new SearchFacet(this.client);
     this.TimeTransform = new TimeTransformSDK(this.client);
     this.UpsertCurve = new UpsertCurve(this.client);
-    this.MarketDataServiceExtensions = new MarketDataServiceExtensions();
+    this.MarketDataServiceExtensions = new MarketDataServiceExtensions(this);
   }
 }
 /**

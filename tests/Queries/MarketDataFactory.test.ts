@@ -56,7 +56,7 @@ test("MarketData Factory actual time series", async () => {
     AggregationRule: AggregationRule.Undefined
   };
 
-  var marketData = mds.MarketDataServiceExtensions.getMarketDataReference(mds, {
+  var marketData = mds.MarketDataServiceExtensions.getMarketDataReference({
     provider: marketDataEntity.ProviderName,
     name: marketDataEntity.MarketDataName
   });
@@ -123,7 +123,7 @@ test("MarketData Factory auction time series", async () => {
     AggregationRule: AggregationRule.Undefined
   };
 
-  var marketData = mds.MarketDataServiceExtensions.getMarketDataReference(mds, {
+  var marketData = mds.MarketDataServiceExtensions.getMarketDataReference({
     provider: marketDataEntity.ProviderName,
     name: marketDataEntity.MarketDataName
   });
@@ -192,7 +192,7 @@ test("MarketData Factory versioned time series", async () => {
     OriginalTimezone: "CET",
     AggregationRule: AggregationRule.Undefined
   };
-  var marketData = mds.MarketDataServiceExtensions.getMarketDataReference(mds, {
+  var marketData = mds.MarketDataServiceExtensions.getMarketDataReference({
     provider: marketDataEntity.ProviderName,
     name: marketDataEntity.MarketDataName
   });
@@ -264,7 +264,7 @@ test("MarketData Factory Market Assessment", async () => {
     OriginalTimezone: "CET",
     AggregationRule: AggregationRule.Undefined
   };
-  var marketData = mds.MarketDataServiceExtensions.getMarketDataReference(mds, {
+  var marketData = mds.MarketDataServiceExtensions.getMarketDataReference({
     provider: marketDataEntity.ProviderName,
     name: marketDataEntity.MarketDataName
   });
