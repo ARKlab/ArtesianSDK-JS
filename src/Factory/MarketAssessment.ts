@@ -1,135 +1,138 @@
-import { UpsertCurveData, MarketAssessmentValue } from './../Service/MarketData/MarketDataService.UpsertCurve';
+import {
+  UpsertCurveData,
+  MarketAssessmentValue,
+} from "./../Service/MarketData/MarketDataService.UpsertCurve";
 import { MarketDataService } from "../Service/MarketData/MarketDataService";
-import { Output } from './../Service/MarketData/Data/MarketDataEntity';
+import { Output } from "./../Service/MarketData/Data/MarketDataEntity";
 import { MarketDataIdentifier } from "../Service/MarketData/MarketDataService.MarketData";
 import { MarketData } from "./MarketData";
-import { IsTimeGranularity, MapTimePeriod, MapDatePeriod } from "../Common/ArtesianUtils";
-import { AddAssessmentOperationResult, DateString } from "../Data/Enums";
-import { IsStartOfIntervalDate, IsStartOfIntervalTime } from "../Common/Intervals";
-import * as R from 'ramda';
+import { IsStartOfInterval, toDateString } from "../Common/ArtesianUtils";
+import { AddAssessmentOperationResult } from "../Data/Enums";
+import * as R from "ramda";
+import * as L from "luxon";
 
 export class MarketAssessment {
-    _marketDataService: MarketDataService;
-    _entity?: Output = undefined;
-    _identifier: MarketDataIdentifier;
+  _marketDataService: MarketDataService;
+  _entity?: Output = undefined;
+  _identifier: MarketDataIdentifier;
 
-    constructor(marketData: MarketData) {
-        this._entity = marketData._entity;
-        this._marketDataService = marketData._marketDataService;
-        this._identifier = ({ provider: this._entity.providerName, name: this._entity.marketDataName })
-        this.Assessments = new Array<AssessmentElement>();
+  constructor(marketData: MarketData) {
+    this._entity = marketData._entity;
+    this._marketDataService = marketData._marketDataService;
+    this._identifier = {
+      provider: this._entity.ProviderName,
+      name: this._entity.MarketDataName,
+    };
+    this.Assessments = new Array<AssessmentElement>();
+  }
+
+  _Assessments: Array<AssessmentElement>;
+  get Assessments(): Array<AssessmentElement> {
+    return this._Assessments;
+  }
+  set Assessments(value: Array<AssessmentElement>) {
+    this._Assessments = value;
+  }
+
+  clearData() {
+    this.Assessments = [];
+  }
+
+  AddData(localDate: Date, product: string, value: MarketAssessmentValue) {
+    if (this._entity === undefined) return;
+
+    return this._addAssessment(localDate, product, value);
+  }
+
+  private _addAssessment(
+    reportTime: Date,
+    product: string,
+    value: MarketAssessmentValue
+  ) {
+    const utcTime = L.DateTime.fromJSDate(reportTime).toUTC().toJSDate();
+    var re = /\+\d+$/;
+    if (re.test(product)) {
+      throw new Error("Relative Products are not supported");
     }
 
-    _Assessments: Array<AssessmentElement>;
-    get Assessments(): Array<AssessmentElement> {
-        return this._Assessments;
-    }
-    set Assessments(value: Array<AssessmentElement>) {
-        this._Assessments = value;
-    }
+    if (this._entity === undefined)
+      throw new Error(this._entity + " entity is undefined");
 
-    clearData() {
-        this.Assessments = [];
-    }
+    if (!IsStartOfInterval(utcTime, this._entity.OriginalGranularity))
+      throw new Error(
+        "Trying to insert Time " +
+          utcTime +
+          " with wrong format to serie " +
+          this._identifier.name +
+          ". Should be of period " +
+          this._entity.OriginalGranularity
+      );
 
-    AddData(localDate: Date, product: string, value: MarketAssessmentValue) {
-        if (this._entity === undefined)
-            return
-        if (IsTimeGranularity(this._entity.originalGranularity)) {
-            throw new Error("This MarketData has Time granularity. Use AddData(Instant time, double? value");
-        }
+    if (
+      this.Assessments.some(
+        (row) => row.ReportTime == reportTime && row.Product === product
+      )
+    )
+      return AddAssessmentOperationResult.ProductAlreadyPresent;
 
-        return this._addAssessment(localDate.toDateString(), product, value);
-    }
+    this.Assessments.push({
+      Product: product,
+      ReportTime: utcTime,
+      Value: value,
+    });
+    return AddAssessmentOperationResult.AssessmentAdded;
+  }
 
-    private _addAssessment(reportTime: DateString, product: string, value: MarketAssessmentValue) {
-        var re = /\+\d+$/
-        if (re.test(product)) {
-            throw new Error("Relative Products are not supported");
-        }
-
-        var period;
-
-        if (this._entity === undefined)
-            return;
-
-        if (IsTimeGranularity(this._entity.originalGranularity)) {
-            period = MapTimePeriod(this._entity.originalGranularity);
-            if (!IsStartOfIntervalTime(new Date(reportTime),period))
-                throw new Error("Trying to insert Report Time " + new Date(reportTime) + " with the wrong format to Assessment " + this._identifier + ". Should be of period " +  period);
-        }
-        else {
-
-            period = MapDatePeriod(this._entity.originalGranularity);
-            if(!IsStartOfIntervalDate(new Date(reportTime),period)){
-                throw new Error("Trying to insert Time " + new Date(reportTime) + " with the wrong format to serie " + this._identifier + ". Should be of period " + period);
-            }
-        }
-
-        if (this.Assessments.some(row => row.ReportTime == reportTime && row.Product === product))
-            return AddAssessmentOperationResult.ProductAlreadyPresent;
-
-        this.Assessments.push(new AssessmentElement(reportTime, product, value));
-        return AddAssessmentOperationResult.AssessmentAdded;
+  async Save(
+    downloadedAt: Date,
+    deferCommandExecution: boolean = false,
+    deferDataGeneration: boolean = true
+  ) {
+    if (this._entity === undefined) {
+      throw new Error(this._entity + " entity is undefined");
     }
 
-    Save(downloadedAt: Date, deferCommandExecution: boolean = false, deferDataGeneration: boolean = true) {
+    if (this.Assessments.length > 0) {
+      var data: UpsertCurveData = {
+        id: this._identifier,
+        timezone: this._entity.OriginalTimezone,
+        downloadedAt: downloadedAt,
+        deferCommandExecution: deferCommandExecution,
+        deferDataGeneration: deferDataGeneration,
+      };
 
-        if (this._entity === undefined) {
-            throw new Error(this._entity + " entity is undefined");
-        }
+      const groupByReportTime = R.groupBy<AssessmentElement>(
+        R.pipe<AssessmentElement, Date, string>(
+          R.prop("ReportTime"),
+          toDateString
+        )
+      );
+      const groupByProduct = R.pipe(
+        R.groupBy<AssessmentElement>(R.prop("Product")),
+        R.mapObjIndexed<AssessmentElement[], AssessmentElement>(R.last),
+        R.mapObjIndexed<AssessmentElement, MarketAssessmentValue>(
+          (x) => x.Value
+        )
+      );
 
-        if (this.Assessments.length > 0) {
-            var data: UpsertCurveData = ({
-                id: this._identifier,
-                timezone: this._entity.originalTimezone,
-                downloadedAt: downloadedAt,
-                deferCommandExecution: deferCommandExecution,
-                deferDataGeneration: deferDataGeneration
-            })
+      const grouping = groupByReportTime(this.Assessments);
+      const assessments = R.mapObjIndexed(groupByProduct, grouping);
 
-            const groupByReportTime = R.groupBy<AssessmentElement>(R.prop('ReportTime'));
-            const groupByProduct = R.pipe(
-                R.groupBy<AssessmentElement>(R.prop('Product')),
-                R.mapObjIndexed<AssessmentElement[], AssessmentElement>(R.last),
-                R.mapObjIndexed<AssessmentElement, MarketAssessmentValue>(x => x.Value),
-            );
+      data.marketAssessment = RecordToDictionary(
+        R.mapObjIndexed(RecordToDictionary, assessments)
+      );
 
-            const grouping = groupByReportTime(this.Assessments);
-            const assessments = R.mapObjIndexed(groupByProduct, grouping);
-
-            data.marketAssessment = assessments;
-
-            this._marketDataService.UpsertCurve.UpsertCurevData(data);
-        }
+      await this._marketDataService.UpsertCurve.UpsertCurevData(data);
     }
+  }
 }
-
-class AssessmentElement {
-    private _ReportTime: DateString;
-    private _Product: string;
-    private _Value: MarketAssessmentValue;
-    constructor(_reportTime: DateString, _product: string, _value: MarketAssessmentValue) {
-    }
-
-    get ReportTime(): DateString {
-        return this._ReportTime;
-    }
-    set ReportTime(value: DateString) {
-        this._ReportTime = value;
-    }
-
-    get Product(): string {
-        return this._Product;
-    }
-    set Product(value: string) {
-        this._Product = value;
-    }
-
-    get Value(): MarketAssessmentValue {
-        return this._Value;
-    }
-    set Value(value: MarketAssessmentValue) {
-        this._Value = value;
-    }
+function RecordToDictionary<A>(rec: {
+  [key: string]: A;
+}): { Key: string; Value: A }[] {
+  return Object.entries(rec).map(([k, v]) => ({ Key: k, Value: v }));
 }
+type AssessmentElement = {
+  ReportTime: Date;
+  Product: string;
+  Value: MarketAssessmentValue;
+};

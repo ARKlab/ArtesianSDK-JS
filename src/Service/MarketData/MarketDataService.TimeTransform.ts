@@ -1,11 +1,9 @@
-import { AxiosInstance } from "axios";
 import { TimeTransform } from "./Data/MarketDataEntity";
 import { PagedResult } from "./Data/Response";
+import { IService } from "./MarketDataService";
 
 export class TimeTransformSDK {
-  _client: AxiosInstance;
-  constructor(client: AxiosInstance) {
-    this._client = client;
+  constructor(private _client: IService) {
   }
   /**
    * Read a time transform entity from the service by ID
@@ -13,7 +11,7 @@ export class TimeTransformSDK {
    * Returns Time Transform Entity
    */
   GetById(timeTransformId: number) {
-    const url = `/timetransform/entity/${timeTransformId}`;
+    const url = `timetransform/entity/${timeTransformId}`;
     return this._client.get<TimeTransform>(url);
   }
   /**
@@ -25,7 +23,7 @@ export class TimeTransformSDK {
    */
   Get(page: number, pageSize: number, userDefined: boolean) {
     const url =
-      `/timetransform/entity` +
+      `timetransform/entity` +
       `?page=${page}` +
       `&pageSize=${pageSize}` +
       `&userDefined=${userDefined}`;
@@ -38,7 +36,7 @@ export class TimeTransformSDK {
    * Returns Time Transform Entity
    */
   Create(timeTransform: TimeTransform) {
-    const url = "/timetransform/entity";
+    const url = "timetransform/entity";
 
     return this._client.post<TimeTransform>(url, timeTransform);
   }
@@ -48,7 +46,7 @@ export class TimeTransformSDK {
    * Returns Time Transform Entity
    */
   Update(timeTransform: TimeTransform) {
-    const url = "/timetransform/entity/" + timeTransform.id;
+    const url = "timetransform/entity/" + timeTransform.id;
 
     return this._client.put<TimeTransform>(url, timeTransform);
   }
@@ -57,7 +55,7 @@ export class TimeTransformSDK {
    * @param timeTransformId The entity id we are going to delete
    */
   Delete(timeTransformId: number) {
-    const url = "/timetransform/entity/" + timeTransformId;
+    const url = "timetransform/entity/" + timeTransformId;
 
     return this._client.delete(url);
   }

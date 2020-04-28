@@ -1,0 +1,13 @@
+{
+  "extends": "../config/tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "module": "commonjs",
+    "target": "ES2017",
+    "lib": ["dom", "scripthost", "ES2017"],
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "inlineSourceMap": false
+  },
+  "files": ["./src/index.ts"]
+}

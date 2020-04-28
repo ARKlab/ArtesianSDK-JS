@@ -1,11 +1,9 @@
 import { validateCustomFilter } from './../../Common/validators';
-import { AxiosInstance } from "axios";
 import { PagedResult } from "./Data/Response";
+import { IService } from './MarketDataService';
 
 export class CustomFilterSDK {
-  _client: AxiosInstance;
-  constructor(client: AxiosInstance) {
-    this._client = client;
+  constructor(private _client: IService) {
   }
   /**
    * Create a new Filter
@@ -14,7 +12,7 @@ export class CustomFilterSDK {
    */
   Create(filter: CustomFilter) {
     validateCustomFilter(filter);
-    var url = "/filter";
+    var url = "filter";
 
     return this._client.post<CustomFilter>(url, filter);
   }
@@ -26,7 +24,7 @@ export class CustomFilterSDK {
    */
   Update(filterId: number, filter: CustomFilter) {
     validateCustomFilter(filter);
-    var url = "/filter/" + filterId;
+    var url = "filter/" + filterId;
 
     return this._client.put<CustomFilter>(url, filter);
   }
@@ -36,7 +34,7 @@ export class CustomFilterSDK {
    * Returns Custom Filter Entity
    */
   GetById(filterId: number) {
-    var url = "/filter/" + filterId;
+    var url = "filter/" + filterId;
 
     return this._client.get<CustomFilter>(url);
   }
@@ -46,7 +44,7 @@ export class CustomFilterSDK {
    * Returns Custom Filter Entity
    */
   Delete(filterId: number) {
-    var url = "/filter/" + filterId;
+    var url = "filter/" + filterId;
 
     return this._client.delete(url);
   }
@@ -60,7 +58,7 @@ export class CustomFilterSDK {
     if (page < 1 || pageSize < 1){
         throw new Error("Page and Page number need to be greater than 0. Page:" + page + " Page Size:" + pageSize);
     }
-    var url = "/filter?" + [`page=${page}` + `pageSize=${pageSize}`].join("&");
+    var url = "filter?" + [`page=${page}` + `pageSize=${pageSize}`].join("&");
 
     return this._client.get<PagedResult<CustomFilter>>(url);
   }

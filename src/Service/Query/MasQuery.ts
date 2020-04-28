@@ -1,9 +1,9 @@
 import * as R from "ramda";
-import * as Q from "./Query";
-import { MasQueryParams, getCurveSelectionParams } from "./Data/Query";
+import * as Q from "./QueryWithExtractionInterval";
+import { MasQueryParams, getCurveSelectionParamsWithInterval } from "./Data/Query";
 import { MasRow, InternalMasRow, masMapper } from "./Data/Response";
 
-export class MasQuery extends Q.Query {
+export class MasQuery extends Q.QueryWithExtractionInterval {
   _queryParams: Partial<MasQueryParams>;
   /**
    * Set list of market products to be queried
@@ -37,7 +37,7 @@ function buildUrl(q: MasQueryParams): string {
 function getUrlQueryParams(q: MasQueryParams): string {
   return [
     Q.getUrlQueryParams(q),
-    getCurveSelectionParams(q),
+    getCurveSelectionParamsWithInterval(q),
     getProductParams(q)
   ]
     .filter(Boolean)

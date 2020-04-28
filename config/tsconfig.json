@@ -3,8 +3,8 @@
   "compilerOptions": {
     "outDir": "../dist",
     "module": "commonjs",
-    "target": "es5",
-    "lib": ["dom", "es2015.promise", "scripthost", "es5", "es6"],
+    "target": "es6",
+    "lib": ["dom", "ES2017", "scripthost"],
     "moduleResolution": "node",
     "sourceMap": true,
     "inlineSourceMap": false

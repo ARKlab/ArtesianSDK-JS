@@ -1,3 +1,4 @@
+import { AuctionTimeSerie } from './AuctionTimeSerie';
 import { MarketDataService } from "../Service/MarketData/MarketDataService";
 import {
   Output,
@@ -17,7 +18,7 @@ export class MarketData {
 
   _marketDataId?: number;
   get marketDataId(): number | undefined {
-    return this._entity.marketDataId;
+    return this._entity.MarketDataId;
   }
 
   _identifier: MarketDataIdentifier;
@@ -45,7 +46,8 @@ export class MarketData {
   }
 
   isTrue(conditionOne: boolean, conditionTwo: boolean): boolean {
-    if (conditionOne == true || conditionTwo == true) {
+    if (conditionOne == true || conditionTwo == true) 
+    {
       return true;
     }
     return false;
@@ -57,41 +59,41 @@ export class MarketData {
     }
     if (
       !this.isTrue(
-        metadata.providerName == null,
-        metadata.providerName == this.identifier.provider
+        metadata.ProviderName == null,
+        metadata.ProviderName == this.identifier.provider
       )
     ) {
-      return Promise.reject(new Error("" + metadata.providerName));
+      return Promise.reject(new Error("" + metadata.ProviderName));
     }
     if (
       !this.isTrue(
-        metadata.marketDataName == null,
-        metadata.marketDataName == this.identifier.name
+        metadata.MarketDataName == null,
+        metadata.MarketDataName == this.identifier.name
       )
     ) {
-      return Promise.reject(new Error("" + metadata.providerName));
+      return Promise.reject(new Error("" + metadata.ProviderName));
     }
 
-    if (isNullOrWhitespace(metadata.originalTimezone)) {
+    if (isNullOrWhitespace(metadata.OriginalTimezone)) {
       return Promise.reject(
         new Error(
           "null or whitespace for original timezone value :" +
-            metadata.originalTimezone
+            metadata.OriginalTimezone
         )
       );
     }
 
-    metadata.providerName = this.identifier.provider;
-    metadata.marketDataName = this.identifier.name;
+    metadata.ProviderName = this.identifier.provider;
+    metadata.MarketDataName = this.identifier.name;
     if (this._entity != null) {
       throw new Error(
-        "Actual Time Series is already registered " + this._entity.marketDataId
+        "Actual Time Series is already registered " + this._entity.MarketDataId
       );
     }
 
     this._entity = (await this._marketDataService.MarketData.RegisterMarketData(
       metadata
-    )).data;
+    ));
     this.metaData = new MarketDataMetadata(this._entity);
   }
 
@@ -110,7 +112,7 @@ export class MarketData {
   async load() {
     this._entity = (await this._marketDataService.MarketData.ReadMarketDataRegistry(
       this.identifier
-    )).data;
+    ));
 
     if (this._entity != null) {
       this.metaData = new MarketDataMetadata(this._entity);
@@ -123,14 +125,14 @@ export class MarketData {
     }
 
     this._entity = (await this._marketDataService.MarketData.UpdateMarketData({
-      marketDataId: this._entity.marketDataId,
-      providerName: this._entity.providerName,
-      marketDataName: this._entity.marketDataName,
-      originalGranularity: this._entity.originalGranularity,
-      type: this._entity.type,
-      originalTimezone: this._entity.originalTimezone,
-      aggregationRule: this._entity.aggregationRule
-    })).data;
+      MarketDataId: this._entity.MarketDataId,
+      ProviderName: this._entity.ProviderName,
+      MarketDataName: this._entity.MarketDataName,
+      OriginalGranularity: this._entity.OriginalGranularity,
+      Type: this._entity.Type,
+      OriginalTimezone: this._entity.OriginalTimezone,
+      AggregationRule: this._entity.AggregationRule
+    }));
 
     this.metaData = new MarketDataMetadata(this._entity);
   }
@@ -139,7 +141,7 @@ export class MarketData {
     if (this._entity == null) {
       throw new Error("Actual Time Series is not yet registered");
     }
-    if (this._entity.type != MarketDataType.ActualTimeSerie) {
+    if (this._entity.Type != MarketDataType.ActualTimeSerie) {
       throw new Error("Entity is not an Actual Time Serie");
     }
 
@@ -152,7 +154,7 @@ export class MarketData {
     if (this._entity == null) {
       throw new Error("Versioned Time Series is not yet registered");
     }
-    if (this._entity.type != MarketDataType.VersionedTimeSerie) {
+    if (this._entity.Type != MarketDataType.VersionedTimeSerie) {
       throw new Error("Entity is not a Versioned Time Serie");
     }
 
@@ -165,11 +167,25 @@ export class MarketData {
     if (this._entity == null) {
       throw new Error("Market Assessment is not yet registered");
     }
-    if (this._entity.type != MarketDataType.MarketAssessment) {
+    if (this._entity.Type != MarketDataType.MarketAssessment) {
       throw new Error("Entity is not a Market Assessment");
     }
 
     var mas = new MarketAssessment(marketData);
+    
     return mas;
+  }
+
+  editAuction(marketData: MarketData) {
+    if (this._entity == null) {
+      throw new Error("Auction Time Series is not yet registered");
+    }
+    if (this._entity.Type != MarketDataType.AuctionTimeSerie) {
+      throw new Error("Entity is not an Auction Time Serie");
+    }
+
+    var auction = new AuctionTimeSerie(marketData);
+
+    return auction;
   }
 }

@@ -1,13 +1,10 @@
-import { validateUpsertCurveData } from './../../Common/validators';
-import { MarketAssessmentValue } from './MarketDataService.UpsertCurve';
-import { AxiosInstance } from "axios";
+import { AuctionBidValue } from "./../../Factory/AuctionTimeSerie";
+import { validateUpsertCurveData } from "./../../Common/validators";
 import { MarketDataIdentifier } from "./MarketDataService.MarketData";
+import { IService } from "./MarketDataService";
 
 export class UpsertCurve {
-  _client: AxiosInstance;
-  constructor(client: AxiosInstance) {
-    this._client = client;
-  }
+  constructor(private _client: IService) {}
   /**
    * Upsert the curve data supplied in <paramref name="data"/>
    * remarks
@@ -19,26 +16,36 @@ export class UpsertCurve {
    * @param data An object that rappresent MarketDataAssessment, ActualTimeSerie or VersionedTimeSerie
    */
   UpsertCurevData(data: UpsertCurveData) {
+    validateUpsertCurveData(data);
 
-    validateUpsertCurveData(data)
-
-    const url = "/marketdata/upsertdata";
+    const url = "marketdata/upsertdata";
 
     return this._client.post(url, data);
   }
 }
 
+export type DateTime = string;
+export type Product = string;
 export type UpsertCurveData = {
   id: MarketDataIdentifier;
-  version?: Date;
+  version?: DateTime;
   timezone: string;
   downloadedAt: Date;
-  marketAssessment?: Record<string, Record<string,MarketAssessmentValue>>;
-  rows?: Map<Date,number | undefined>;
+  marketAssessment?: {
+    Key: DateTime;
+    Value: { Key: Product; Value: MarketAssessmentValue }[];
+  }[];
+  rows?: Array<{ Key: DateTime; Value?: number }>;
   deferCommandExecution?: boolean;
   deferDataGeneration?: boolean;
+  auctionRows?: Array<{ Key: DateTime; Value: AuctionBid }>;
 };
 
+type AuctionBid = {
+  bidTimestamp: DateTime;
+  bid: AuctionBidValue[];
+  offer: AuctionBidValue[];
+};
 export type MarketAssessmentValue = {
   settlement?: number;
   open?: number;
@@ -49,4 +56,3 @@ export type MarketAssessmentValue = {
   volueGiven?: number;
   volume?: number;
 };
-

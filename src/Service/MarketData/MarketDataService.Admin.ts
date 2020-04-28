@@ -1,10 +1,8 @@
-import { AxiosInstance } from "axios";
 import { PagedResult } from "./Data/Response";
+import { IService } from "./MarketDataService";
 
 export class Admin {
-  _client: AxiosInstance;
-  constructor(client: AxiosInstance) {
-    this._client = client;
+  constructor(private _client: IService) {
   }
   /**
    * Create a new Authorization Group
@@ -12,7 +10,7 @@ export class Admin {
    * Returns Auth Group entity
    */
   CreateAuthGroup(group: AuthGroup) {
-    var url = "/group";
+    var url = "group";
 
     return this._client.post<AuthGroup>(url, group);
   }
@@ -23,7 +21,7 @@ export class Admin {
    * Returns Auth Group entity
    */
   UpdateAuthGroup(groupId: number, group: AuthGroup) {
-    var url = "/group/" + groupId;
+    var url = "group/" + groupId;
 
     return this._client.put<AuthGroup>(url, group);
   }
@@ -32,7 +30,7 @@ export class Admin {
    * @param groupId The entity Identifier
    */
   RemoveAuthGroup(groupId: number) {
-    var url = "/group/" + groupId;
+    var url = "group/" + groupId;
 
     return this._client.delete(url);
   }
@@ -42,7 +40,7 @@ export class Admin {
    * Returns AuthGroup entity
    */
   ReadAuthGroup(groupId: number) {
-    var url = "/group/" + groupId;
+    var url = "group/" + groupId;
 
     return this._client.get<AuthGroup>(url);
   }
@@ -53,7 +51,7 @@ export class Admin {
    * Returns Paged result of Auth Group entity
    */
   ReadAuthGroups(page: number, pageSize: number) {
-    var url = "/group?" + [`pageSize=${pageSize}`, `page=${page}`].join("&");
+    var url = "group?" + [`pageSize=${pageSize}`, `page=${page}`].join("&");
 
     return this._client.get<PagedResult<AuthGroup>>(url);
   }
@@ -63,7 +61,7 @@ export class Admin {
    * Returns List of Principals entity
    */
   ReadUserPrincipals(user: string) {
-    var url = `/user/principals?user=${user}`;
+    var url = `user/principals?user=${user}`;
 
     return this._client.get<Principals[]>(url);
   }

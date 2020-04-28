@@ -1,85 +1,28 @@
+import * as Q from "./Query";
 import {
   QueryParamsWithInterval,
-  CurveSelectionType,
   ExtractionRangeType,
   RelativeIntervalType
 } from "./Data/Query";
 import { IService } from "./QueryService";
 import { IPartitionStrategy } from "./Partition/IdPartitionStrategy";
 
-export class Query {
+export class QueryWithExtractionInterval extends Q.Query{
   _queryParams: Partial<QueryParamsWithInterval> = {};
   constructor(
     public client: IService,
-    public partitionStrategy: IPartitionStrategy
-  ) {}
-  /**
-   * Set the market ids to be queried
-   * @param ids
-   */
-  ForMarketData(ids: number[]) {
-    this._queryParams.curveSelection = {
-      tag: CurveSelectionType.IdSelection,
-      val: ids
-    };
-    return this;
+    public partitionStrategy: IPartitionStrategy,
+  ) {
+    super(client, partitionStrategy);
   }
   /**
-   * Set the filter id to be queried
-   * @param id The filter id to be queried
+   * Query by relative interval
+   * @param interval the interval to query by
    */
-  ForFilterId(id: number) {
-    this._queryParams.curveSelection = {
-      tag: CurveSelectionType.FilterSelection,
-      val: id
-    };
-    return this;
-  }
-  /**
-   * Set the timezone to be queried
-   * @param tz
-   */
-  InTimezone(tz: string) {
-    this._queryParams.tz = tz;
-    return this;
-  }
-  /**
-   * Query by absolute range
-   * @param start start date
-   * @param end end date
-   */
-  InAbsoluteDateRange(start: Date, end: Date) {
-    if(start >= end)
-      throw new Error("End date must be greater than start date");
-
+  InRelativeInterval(interval: RelativeIntervalType) {
     this._queryParams.extractionRange = {
-      tag: ExtractionRangeType.DateRange,
-      start: start,
-      end: end
-    };
-    return this;
-  }
-  /**
-   * Query by relative period range
-   * @param from period start
-   * @param to period end
-   */
-  InRelativePeriodRange(from: string, to: string) {
-    this._queryParams.extractionRange = {
-      tag: ExtractionRangeType.PeriodRange,
-      PeriodFrom: from,
-      PeriodTo: to
-    };
-    return this;
-  }
-  /**
-   * Query by relative period
-   * @param extractionPeriod
-   */
-  InRelativePeriod(extractionPeriod: string) {
-    this._queryParams.extractionRange = {
-      tag: ExtractionRangeType.Period,
-      Period: extractionPeriod
+      tag: ExtractionRangeType.RelativeInterval,
+      Interval: interval
     };
     return this;
   }

@@ -1,107 +1,98 @@
-import { atMidnight } from './../Common/ArtesianUtils';
-import { UpsertCurveData } from './../Service/MarketData/MarketDataService.UpsertCurve';
-import { MarketDataIdentifier } from './../Service/MarketData/MarketDataService.MarketData';
-import { Output } from './../Service/MarketData/Data/MarketDataEntity';
+import { UpsertCurveData } from "./../Service/MarketData/MarketDataService.UpsertCurve";
+import { MarketDataIdentifier } from "./../Service/MarketData/MarketDataService.MarketData";
+import { Output } from "./../Service/MarketData/Data/MarketDataEntity";
 import { MarketDataService } from "../Service/MarketData/MarketDataService";
-import { MarketData } from  "./MarketData";
+import { MarketData } from "./MarketData";
 import { AddTimeSerieOperationResult } from "../Data/Enums";
-import { IsTimeGranularity, MapTimePeriod, MapDatePeriod} from "../Common/ArtesianUtils";
-import { IsStartOfIntervalDate, IsStartOfIntervalTime } from "../Common/Intervals";
+import {
+  IsTimeGranularity,
+  IsStartOfInterval,
+  MapToMarketData,
+} from "../Common/ArtesianUtils";
+import * as L from "luxon";
 
+export class ActualTimeSerie {
+  _marketDataService: MarketDataService;
+  _entity?: Output = undefined;
+  _identifier: MarketDataIdentifier;
+  _values: Map<Date, number | undefined> = new Map();
 
-export class ActualTimeSerie{
-    _marketDataService: MarketDataService;
-    _entity? : Output = undefined;
-    _identifier : MarketDataIdentifier;
-    _values: Map<Date,number| undefined> = new Map();
-    
-    constructor(marketData: MarketData){
-        this._entity = marketData._entity;
-        this._marketDataService = marketData._marketDataService;
-        this._identifier = ({ provider: this._entity.providerName, name: this._entity.marketDataName });
-        this.Values = this._values;
+  constructor(marketData: MarketData) {
+    this._entity = marketData._entity;
+    this._marketDataService = marketData._marketDataService;
+    this._identifier = {
+      provider: this._entity.ProviderName,
+      name: this._entity.MarketDataName,
+    };
+    this.Values = this._values;
+  }
+
+  get Values(): Map<Date, number | undefined> {
+    return this._values;
+  }
+  set Values(value: Map<Date, number | undefined>) {
+    this._values = value;
+  }
+
+  clearData() {
+    this._values = new Map();
+    this.Values = this._values;
+  }
+
+  AddData(date: Date, value: number) {
+    if (this._entity == null) {
+      throw new Error("entity  null");
     }
 
-    get Values(): Map<Date,number| undefined>{
-        return this._values;
-    }
-    set Values(value: Map<Date,number| undefined>){
-        this._values = value;
-    }
+    return this._add(date, value);
+  }
 
-    clearData(){
-         this._values = new Map();
-         this.Values = this._values;
+  private _add(localTime: Date, value: number) {
+    const utcTime = L.DateTime.fromJSDate(localTime).toUTC().toJSDate();
+    if (this._values.has(utcTime)) {
+      return AddTimeSerieOperationResult.TimeAlreadyPresent;
     }
 
-    AddData(localDate : Date, value : number){
-        
-        if(this._entity == null){
-            throw new Error("entity  null");
-        }
+    if (this._entity === undefined) {
+      throw new Error(this._entity + " entity is undefined");
+    }
+    if (!IsStartOfInterval(utcTime, this._entity.OriginalGranularity))
+      throw new Error(
+        "Trying to insert Time " +
+          utcTime +
+          " with wrong format to serie " +
+          this._identifier.name +
+          ". Should be of period " +
+          this._entity.OriginalGranularity
+      );
 
-        if(IsTimeGranularity(this._entity.originalGranularity)){
-            throw new Error("This MarketData has Time granularity. Use AddData(Instant time, double? value");
-        }
+    this._values.set(utcTime, value);
 
-        var localTime = atMidnight(localDate);
+    return AddTimeSerieOperationResult.ValueAdded;
+  }
 
-        return this._add(localTime, value);
+  async Save(
+    downloadedAt: Date,
+    deferCommandExecution: boolean = false,
+    deferDataGeneration: boolean = true
+  ) {
+    if (this._entity == null) {
+      throw new Error(this._entity + " entity is null");
     }
 
-    private _add(localTime: Date, value: number){
+    if (this._values.size > 0) {
+      var data: UpsertCurveData = {
+        id: this._identifier,
+        timezone: IsTimeGranularity(this._entity.OriginalGranularity)
+          ? "UTC"
+          : this._entity.OriginalTimezone,
+        downloadedAt,
+        rows: MapToMarketData(this._values),
+        deferCommandExecution: deferCommandExecution,
+        deferDataGeneration: deferDataGeneration,
+      };
 
-        if (this._values.has(localTime)){
-            return AddTimeSerieOperationResult.TimeAlreadyPresent;
-        }
-        
-        var period;
-
-        if (this._entity === undefined) {
-            throw new Error(this._entity + " entity is undefined");
-        }
-
-        if (IsTimeGranularity(this._entity.originalGranularity))
-        {
-            period = MapTimePeriod(this._entity.originalGranularity);
-            if (!IsStartOfIntervalTime(localTime,period))
-                throw new Error("Trying to insert Time " + localTime + " with wrong format to serie " + this._identifier + ". Should be of period " + period);
-        }
-        else
-        {
-            period = MapDatePeriod(this._entity.originalGranularity);
-            if(!IsStartOfIntervalDate(localTime,period)){
-                throw new Error("Trying to insert Time " + localTime + " with the wrong format to serie " + this._identifier + ". Should be of period " + period);
-            }
-        }
-            //iso
-            //expected output: Wed, 14 Jun 2017 07:00:00 GMT
-            //this._values[localTime.toUTCString()]= value
-            this._values.set(localTime,value);
-
-            return AddTimeSerieOperationResult.ValueAdded;
+      await this._marketDataService.UpsertCurve.UpsertCurevData(data);
     }
-
-    Save(downloadedAt: Date, deferCommandExecution: boolean = false, deferDataGeneration: boolean = true){
-
-        if(this._entity == null){
-            throw new Error (this._entity + " entity is null");
-        }
-
-        if (this._values.size > 0)
-            {
-                var data: UpsertCurveData = ({
-                    id: this._identifier,
-                    timezone: IsTimeGranularity(this._entity.originalGranularity) ? "UTC" : this._entity.originalTimezone,
-                    downloadedAt: downloadedAt,
-                    rows: this._values,
-                    deferCommandExecution: deferCommandExecution,
-                    deferDataGeneration: deferDataGeneration
-                })
-        
-             this._marketDataService.UpsertCurve.UpsertCurevData(data);
-            }
-            //else
-            //    _logger.Warn("No Data to be saved.");
-        }
-    }
+  }
+}

@@ -29,7 +29,6 @@ export const isValidString = (validStringCheck: string, minLength: number, maxLe
          throw new Error("Provider must be between 1 and 50 characters.")
      }
      if(CharacterValidatorRegEx.test(validStringCheck)){
-         
         throw new Error("Invalid string. Should not contain trailing or leading whitespaces or any of the following characters: ,:;'\"<space>");
      }
 }
@@ -60,7 +59,7 @@ export const validateCustomFilter = (customFilter: CustomFilter) => {
     }
 
     if(isNullOrWhitespace(customFilter.searchText) && customFilter.filters == null){
-        throw new Error("Either filter text or filter key values must be provided.")
+        throw new Error("Either filter text or filter key values must be provided.");
     }
 }
 /**
@@ -68,11 +67,11 @@ export const validateCustomFilter = (customFilter: CustomFilter) => {
  * @param marketDataEntityInput 
  */
 export const validateRegisterMarketDataEntity = (marketDataEntityInput: Input) => {
-    if(marketDataEntityInput.marketDataId != 0){
-        throw new Error("MarketDataId must be 0")
+    if(marketDataEntityInput.MarketDataId != 0){
+        throw new Error("MarketDataId must be 0");
     }
 
-    if(marketDataEntityInput.type == MarketDataType.MarketAssessment && marketDataEntityInput.transformId != null){
+    if(marketDataEntityInput.Type == MarketDataType.MarketAssessment && marketDataEntityInput.TransformId != null){
         throw new Error("No transform possible when Type is MarketAssessment");
     }
 }
@@ -81,11 +80,11 @@ export const validateRegisterMarketDataEntity = (marketDataEntityInput: Input) =
  * @param marketDataEntityInput 
  */
 export const validateUpdateMarketDataEntity = (marketDataEntityInput: Input) => {
-    if(marketDataEntityInput.type == MarketDataType.MarketAssessment && marketDataEntityInput.transformId != null){
-        throw new Error("No transform possible when Type is MarketAssessment")
+    if(marketDataEntityInput.Type == MarketDataType.MarketAssessment && marketDataEntityInput.TransformId != null){
+        throw new Error("No transform possible when Type is MarketAssessment");
     }
     
-    if(marketDataEntityInput.type == MarketDataType.MarketAssessment && marketDataEntityInput.aggregationRule != AggregationRule.Undefined){
+    if(marketDataEntityInput.Type == MarketDataType.MarketAssessment && marketDataEntityInput.AggregationRule != AggregationRule.Undefined){
         
         throw new Error("Aggregation Rule must be Undefined if Type is MarketAssessment");
     }
@@ -144,72 +143,69 @@ export const validateUpsertCurveData = (upsertCurveData:UpsertCurveData) => {
         throw new Error("UpsertCurveData ID must be valorized");
     }
 
+    //Open issue for IANA support for Date-fns
     //nodatime timezone check tzdb 
     // if (upsertCurveData.timezone != null && DateTimeZoneProviders.Tzdb.GetZoneOrNull(upsertCurveData.timezone) == null)
     //             throw new Error("UpsertCurveData Timezone must be in IANA database if valorized");
 
     if(upsertCurveData.downloadedAt == null){
-        throw new Error("UpsertCurveData DownloadedAt must be valorized")
+        throw new Error("UpsertCurveData DownloadedAt must be valorized");
     }
 
-    if(upsertCurveData.marketAssessment == null && (upsertCurveData.rows == null || upsertCurveData.rows.size == 0)){
-        throw new Error("UpsertCurveData Rows must be valorized if MarketAssessment is null");
-    }
-
-    if(upsertCurveData.marketAssessment != null && upsertCurveData.rows != null){
-        throw new Error("UpsertCurveData MarketAssessment must be valorized if Rows are null")
-    }
-
-    if(upsertCurveData.rows == null){
-
-        if(upsertCurveData.version != null){
-            throw new Error("UpsertCurveData Version must be NULL if Rows are NULL")
-        }
+    if(upsertCurveData.rows == null)
+    {
+        if(upsertCurveData.version != null)
+            throw new Error("UpsertCurveData Version must be NULL if Rows are NULL");
         
-        if(upsertCurveData.marketAssessment == null || countMarketAssessments(upsertCurveData.marketAssessment) == 0){
-            throw new Error("UpsertCurveData Rows must be valorized if MarketAssessment is null");
-        }
+        if((upsertCurveData.marketAssessment == null || upsertCurveData.marketAssessment.length == 0) && (upsertCurveData.auctionRows == null || upsertCurveData.auctionRows.length == 0))
+            throw new Error("UpsertCurveData MarketAssessment/Bids must be valorized if Rows are NULL");
     }
-    else{
+    else
+    {
+        if (upsertCurveData.marketAssessment != null)
+            throw new Error("UpsertCurveData MarketAssessment must be NULL if Rows are Valorized");
 
-        if(upsertCurveData.marketAssessment != null && upsertCurveData.rows != null){
-            throw new Error("UpsertCurveData MarketAssessment must be valorized if Rows are null")
-        }
+        if (upsertCurveData.auctionRows != null)
+            throw new Error("UpsertCurveData Bids must be NULL if Rows are Valorized");
 
-        if(upsertCurveData.rows == null){
-            if(upsertCurveData.version != null){
-                throw new Error("UpsertCurveData Version must be NULL if Rows are NULL")
-            }
+        if(upsertCurveData.rows != undefined){
+            var iterator = upsertCurveData.rows.keys();
 
-            if(upsertCurveData.marketAssessment == null || countMarketAssessments(upsertCurveData.marketAssessment) == 0){
-                throw new Error("UpsertCurveData MarketAssessment must be valorized if Rows are NULL")
-            }
-        }
-        else{
-            if(upsertCurveData.marketAssessment != null){
-                throw new Error("UpsertCurveData MarketAssessment must be NULL if Rows are Valorized")
-            }
-
-            if(upsertCurveData.rows != undefined){
-                var iterator = upsertCurveData.rows.keys();
-
-                while(iterator.next().done != true){
-                    
-                    if(iterator.next().value == new Date()){
-                        throw new Error("Invalid timepoint")
-                    }
-
+            while(iterator.next().done != true){
+                
+                if(iterator.next().value == new Date()){
+                    throw new Error(`Rows[${iterator}]Invalid timepoint`);
                 }
             }
-
-            // foreach (var row in upsertCurveData.Rows)
-            //     {
-            //         if (row.Key == default)
-            //             throw new ArgumentException($"Rows[{row}]", "Invalid timepoint");
-            //     }
-            
         }
-        
+    }
+
+    if(upsertCurveData.marketAssessment == null)
+    {
+        if ((upsertCurveData.rows == null || upsertCurveData.rows.length == 0) && (upsertCurveData.auctionRows == null || upsertCurveData.auctionRows.length == 0))
+            throw new Error("UpsertCurveData Rows/Bids must be valorized if MarketAssesment are NULL");
+    }
+    else
+    {
+        if (upsertCurveData.rows != null)
+            throw new Error("UpsertCurveData Rows must be NULL if MarketAssessment are Valorized");
+
+        if (upsertCurveData.auctionRows != null)
+            throw new Error("UpsertCurveData Bids must be NULL if MarketAssessment are Valorized");
+    }
+
+    if (upsertCurveData.auctionRows == null)
+    {
+        if ((upsertCurveData.rows == null || upsertCurveData.rows.length == 0) && (upsertCurveData.marketAssessment == null || upsertCurveData.marketAssessment.length == 0))
+            throw new Error("UpsertCurveData Rows/MarketAssessment must be valorized if Bids are NULL");
+    }
+    else
+    {
+        if (upsertCurveData.rows != null)
+            throw new Error("UpsertCurveData Rows must be NULL if Bids are Valorized");
+
+        if (upsertCurveData.marketAssessment != null)
+            throw new Error("UpsertCurveData MarketAssesment must be NULL if Bids are Valorized");
     }
 }
 /**
@@ -226,6 +222,22 @@ export const countMarketAssessments = (record: Record<string, Record<string,Mark
         count++;
     }
   
+    return count;
+}
+/**
+ * Count of AuctionRows
+ * @param record 
+ */
+export const countAuctionRows = (record: {}[]) => {
+    var count = 0;
+
+    for(let key of record){
+        //key needs to be defined to avoid not referenced error
+        key;
+
+        count++;
+    }
+    
     return count;
 }
 

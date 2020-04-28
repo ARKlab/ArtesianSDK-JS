@@ -1,10 +1,8 @@
-import { AxiosInstance } from "axios";
 import { Output } from "./Data/MarketDataEntity";
+import { IService } from "./MarketDataService";
 
 export class Operations {
-  _client: AxiosInstance;
-  constructor(client: AxiosInstance) {
-    this._client = client;
+  constructor(private _client: IService) {
   }
   /**
    *  A sequence of operation will be applied to the metadata identified by ids
@@ -12,7 +10,7 @@ export class Operations {
    * Returns MarketData Entity Output
    */
   PerformOperations(operations: OperationsInput) {
-    const url = "/marketdata/operations";
+    const url = "marketdata/operations";
 
     return this._client.post<Output[]>(url, operations);
   }

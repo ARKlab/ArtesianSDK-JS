@@ -1,11 +1,16 @@
 import { Granularity } from "../../../Data/Enums";
 
-export type QueryParams = {
+export type QueryParamsWithInterval = {
   extractionRange: ExtractionRange;
   curveSelection: CurveSelection;
   tz?: string;
 };
-export function getCurveSelectionParams(q: QueryParams): string {
+export type QueryParamsWithRange = {
+  extractionRange: ExtractionRangeWithoutInterval;
+  curveSelection: CurveSelection;
+  tz?: string;
+};
+export function getCurveSelectionParamsWithInterval(q: QueryParamsWithInterval): string {
   switch (q.curveSelection.tag) {
     case CurveSelectionType.IdSelection:
       return "id=" + q.curveSelection.val.join(",");
@@ -13,12 +18,22 @@ export function getCurveSelectionParams(q: QueryParams): string {
       return "filterId=" + q.curveSelection.val.toString();
   }
 }
-export type ActualQueryParams = QueryParams & {
+export function getCurveSelectionParamsWithRange(q: QueryParamsWithRange): string {
+  switch (q.curveSelection.tag) {
+    case CurveSelectionType.IdSelection:
+      return "id=" + q.curveSelection.val.join(",");
+    case CurveSelectionType.FilterSelection:
+      return "filterId=" + q.curveSelection.val.toString();
+  }
+}
+export type ActualQueryParams = QueryParamsWithInterval & {
   granularity: Granularity;
   tr?: number;
 };
 
-export type VersionedQueryParams = QueryParams & {
+export type AuctionQueryParams = QueryParamsWithRange
+
+export type VersionedQueryParams = QueryParamsWithInterval & {
   granularity: Granularity;
   tr?: number;
   versionSelection: VersionSelection;
@@ -28,7 +43,7 @@ export function addTimeTransformQueryParam(q: { tr?: number }): string {
   return q.tr ? "tr=" + q.tr.toString() : "";
 }
 
-export type MasQueryParams = QueryParams & {
+export type MasQueryParams = QueryParamsWithInterval & {
   products: string[];
 };
 
@@ -73,6 +88,11 @@ export type ExtractionRange =
   | Period
   | PeriodRange
   | RelativeInterval;
+
+  export type ExtractionRangeWithoutInterval =
+  | DateRange
+  | Period
+  | PeriodRange;
 
 export type DateRange = {
   tag: ExtractionRangeType.DateRange;
