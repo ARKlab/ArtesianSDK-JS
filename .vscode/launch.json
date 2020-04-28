@@ -10,8 +10,7 @@
       "name": "Launch Runner",
       "program": "${workspaceFolder}\\runner\\dist\\runner\\src\\index.js",
       "outFiles": ["${workspaceFolder}/runner/dist/**/*.js"],
-      "preLaunchTask": "build:runner",
-      "console": "integratedTerminal"
+      "preLaunchTask": "build:runner"
     },
     {
       "name": "Debug Jest Tests",

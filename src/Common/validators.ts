@@ -157,12 +157,12 @@ export const validateUpsertCurveData = (upsertCurveData:UpsertCurveData) => {
         if(upsertCurveData.version != null)
             throw new Error("UpsertCurveData Version must be NULL if Rows are NULL");
         
-        if((upsertCurveData.MarketAssessment == null || upsertCurveData.MarketAssessment.length == 0) && (upsertCurveData.auctionRows == null || upsertCurveData.auctionRows.length == 0))
+        if((upsertCurveData.marketAssessment == null || upsertCurveData.marketAssessment.length == 0) && (upsertCurveData.auctionRows == null || upsertCurveData.auctionRows.length == 0))
             throw new Error("UpsertCurveData MarketAssessment/Bids must be valorized if Rows are NULL");
     }
     else
     {
-        if (upsertCurveData.MarketAssessment != null)
+        if (upsertCurveData.marketAssessment != null)
             throw new Error("UpsertCurveData MarketAssessment must be NULL if Rows are Valorized");
 
         if (upsertCurveData.auctionRows != null)
@@ -180,7 +180,7 @@ export const validateUpsertCurveData = (upsertCurveData:UpsertCurveData) => {
         }
     }
 
-    if(upsertCurveData.MarketAssessment == null)
+    if(upsertCurveData.marketAssessment == null)
     {
         if ((upsertCurveData.rows == null || upsertCurveData.rows.length == 0) && (upsertCurveData.auctionRows == null || upsertCurveData.auctionRows.length == 0))
             throw new Error("UpsertCurveData Rows/Bids must be valorized if MarketAssesment are NULL");
@@ -196,7 +196,7 @@ export const validateUpsertCurveData = (upsertCurveData:UpsertCurveData) => {
 
     if (upsertCurveData.auctionRows == null)
     {
-        if ((upsertCurveData.rows == null || upsertCurveData.rows.length == 0) && (upsertCurveData.MarketAssessment == null || upsertCurveData.MarketAssessment.length == 0))
+        if ((upsertCurveData.rows == null || upsertCurveData.rows.length == 0) && (upsertCurveData.marketAssessment == null || upsertCurveData.marketAssessment.length == 0))
             throw new Error("UpsertCurveData Rows/MarketAssessment must be valorized if Bids are NULL");
     }
     else
@@ -204,7 +204,7 @@ export const validateUpsertCurveData = (upsertCurveData:UpsertCurveData) => {
         if (upsertCurveData.rows != null)
             throw new Error("UpsertCurveData Rows must be NULL if Bids are Valorized");
 
-        if (upsertCurveData.MarketAssessment != null)
+        if (upsertCurveData.marketAssessment != null)
             throw new Error("UpsertCurveData MarketAssesment must be NULL if Bids are Valorized");
     }
 }

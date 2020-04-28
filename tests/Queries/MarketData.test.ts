@@ -196,7 +196,7 @@ describe("MetaDataQueries", () => {
       id: { provider: "TestProviderName", name: "TestCurveName" },
       timezone: "CET",
       downloadedAt: new Date(),
-      MarketAssessment: [{ Key: "", Value: [] }],
+      marketAssessment: [{ Key: "", Value: [] }],
     }).then(() => {
       expect(getMoxiosUrl().url.split("/").slice(-2)).toEqual([
         "marketdata",

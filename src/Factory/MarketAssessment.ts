@@ -118,7 +118,7 @@ export class MarketAssessment {
       const grouping = groupByReportTime(this.Assessments);
       const assessments = R.mapObjIndexed(groupByProduct, grouping);
 
-      data.MarketAssessment = RecordToDictionary(
+      data.marketAssessment = RecordToDictionary(
         R.mapObjIndexed(RecordToDictionary, assessments)
       );
 

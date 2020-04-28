@@ -31,7 +31,7 @@ export type UpsertCurveData = {
   version?: DateTime;
   timezone: string;
   downloadedAt: Date;
-  MarketAssessment?: {
+  marketAssessment?: {
     Key: DateTime;
     Value: { Key: Product; Value: MarketAssessmentValue }[];
   }[];
@@ -49,7 +49,7 @@ type AuctionBid = {
 export type MarketAssessmentValue = {
   settlement?: number;
   open?: number;
-  Close?: number;
+  close?: number;
   high?: number;
   low?: number;
   volumePaid?: number;
