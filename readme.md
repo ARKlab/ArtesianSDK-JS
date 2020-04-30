@@ -30,7 +30,7 @@ import { QueryService } from "artesian-sdk";
 //API-Key
 qs = QueryService.FromApiKey({
   baseUrl: "https://fake-artesian-env/",
-  key: "5418B0DB-7AB9-4875-81BA-6EE609E073B6"
+  key: "5418B0DB-7AB9-4875-81BA-6EE609E073B6",
 });
 
 //Client credentials
@@ -39,7 +39,7 @@ qs = QueryService.FromAuthConfig({
   audience: "audience",
   domain: "domain",
   clientId: "client_id",
-  clientSecret: "client_secret"
+  clientSecret: "client_secret",
 });
 ```
 
@@ -109,6 +109,24 @@ To construct an Actual Time Series the following must be provided.
 | ---------------------- | --------------------------------------------------------------------------- |
 | Curve Selection        | A [curve selection](#curve-selection)                                       |
 | Product                | An array of Products                                                        |
+| Time Extraction Window | An [extraction time window](#time-extraction-window) for data to be queried |
+
+## Auction Time Series
+
+```javascript
+import { QueryService } from "artesian-sdk";
+
+qs.CreateAuction()
+  .ForMarketData([100000001])
+  .InAbsoluteDateRange(new Date("2018-1-1"), new Date("2018-1-10"))
+  .Execute();
+```
+
+To construct an Auction Time Series the following must be provided.
+
+| Auction Query          | Description                                                                 |
+| ---------------------- | --------------------------------------------------------------------------- |
+| Curve Selection        | A [curve selection](#curve-selection)                                       |
 | Time Extraction Window | An [extraction time window](#time-extraction-window) for data to be queried |
 
 ## Running a Query
@@ -231,6 +249,144 @@ Other recommended libraries to build a period string are:
 - [luxon](https://moment.github.io/luxon/index.html)
 - [moment.js](http://momentjs.com/)
 
+## MarketData Service
+
+Using the ArtesianServiceConfig `cfg` we create an instance of the MarketDataService which is used to retrieve and edit
+MarketData refrences. `getMarketReference` will read the marketdata entity by marketDataIdentifier, curve provider and curve name.
+
+```javascript
+import { MarketDataService } from "artesian-sdk";
+
+const cfg = {
+  baseUrl: "https://fake-artesian-env",
+  key: "5418B0DB-7AB9-4875-81BA-6EE609E073B6",
+};
+
+const marketDataService = MarketDataService.FromApiKey(cfg);
+
+const marketData = marketDataService.MarketDataServiceExtensions.getMarketDataReference(
+  {
+    provider: marketDataEntity.ProviderName,
+    name: marketDataEntity.MarketDataName,
+  }
+);
+```
+
+To Check MarketData for `isRegistered` status, returns true if present or false if not found.
+
+```javascript
+var isRegistered = await marketData.isRegistered();
+```
+
+A new curve can be registered using the `Register` method and providing metadata as input.
+
+```javascript
+/*
+type Input = {
+  MarketDataId?: number;
+  ETag?: string;
+  ProviderName: string;
+  MarketDataName: string;
+  OriginalGranularity: Granularity;
+  Type: MarketDataType;
+  OriginalTimezone: string;
+  AggregationRule: AggregationRule;
+  TransformId?: number;
+  ProviderDescription?: string;
+  Tags?: Record<string, string[]>;
+  Path?: string;
+};
+*/
+
+await marketData.Register(marketDataEntity);
+```
+
+Calling `Load`, retrieves the current metadata of a MarketData.
+
+```javascript
+await marketData.Load();
+```
+
+Using `Write mode` to edit MarketData and `save` to save the data of the current MarketData providing an instant.
+
+### Actual Time Series
+
+`EditActual` starts the write mode for an Actual Time serie. Checks are done to verify registration and MarketDataType to verify it is an Actual Time Serie.
+Using `AddData` to be written.
+
+```javascript
+var writeMarketData = marketdata.EditActual();
+
+writeMarketData.AddData(new Date("2020-01-01"), 10);
+writeMarketData.AddData(new Date("2020-01-02"), 15);
+
+await writeMarketData.Save(new Date());
+```
+
+### Versioned Time Series
+
+`EditVersioned` starts the write mode for a Versioned Time serie. Checks are done to verify registration and MarketDataType to verify it is a Versioned Time Serie.
+Using `AddData` to be written.
+
+```javascript
+var writeMarketData = marketData.EditVersioned(new Date("2020-01-01"));
+
+writeMarketData.AddData(new Date("2020-01-01"), 10);
+writeMarketData.AddData(new Date("2020-01-02"), 15);
+
+await writeMarketData.Save(new Date());
+```
+
+### Market Assessment Time Series
+
+`EditMarketAssessment` starts the write mode for a Market Assessment. Checks are done to verify registration and MarketDataType to verify it is a Market Assessment.
+Using `AddData` to provide a local date time and a MarketAssessmentValue to be written.
+
+```javascript
+var writeMarketData = marketData.EditMarketAssessment();
+
+type marketAssessmentValue = {
+  settlement?: number,
+  open?: number,
+  close?: number,
+  high?: number,
+  low?: number,
+  volumePaid?: number,
+  volueGiven?: number,
+  volume?: number,
+};
+
+writeMarketData.AddData(
+  new Date("2020-01-01"),
+  "Dec-20",
+  marketAssessmentValue
+);
+
+await writeMarketData.Save(new Date());
+```
+
+### Auction Time Series
+
+`editAuction` starts the write mode for a Auction. Checks are done to verify registration and MarketDataType to verify it is a Auction curve.
+Using `AddData` to provide a date and Auction bid and offer arrays to be written.
+
+```javascript
+var writeMarketData = marketData.editAuction(marketData);
+
+writeMarketData.AddData(
+  new Date("2020-01-01"),
+  [{ price: 100, quantity: 10 }],
+  [{ price: 120, quantity: 12 }]
+);
+writeMarketData.AddData(
+  new Date("2020-01-02"),
+  [{ price: 100, quantity: 10 }],
+  [{ price: 120, quantity: 12 }]
+);
+
+await writeMarketData.Save(getUTCDate(new Date()));
+```
+
 ## Advanced Configuration
 
 Both the `FromApiKey` and `FromAuthConfig` QueryService methods take advanced configuration options
@@ -243,7 +399,7 @@ When large amounts of data need to be requested from the service a partitioning 
 QueryService.FromApiKey({
   baseUrl: string,
   key: string,
-  queryOptions: { partitionSize: 25 }
+  queryOptions: { partitionSize: 25 },
 });
 
 QueryService.FromAuthConfig({
@@ -252,7 +408,7 @@ QueryService.FromAuthConfig({
   domain: "domain",
   clientId: "client_id",
   clientSecret: "client_secret",
-  queryOptions: { partitionSize: 25 }
+  queryOptions: { partitionSize: 25 },
 });
 ```
 
@@ -268,15 +424,15 @@ interface IPartitionStrategy {
 }
 
 const doNothingStrategy = {
-  Actual: x => x,
-  Versioned: x => x,
-  Mas: x => x
+  Actual: (x) => x,
+  Versioned: (x) => x,
+  Mas: (x) => x,
 };
 
 const qs = QueryService.FromApiKey({
   baseUrl: string,
   key: string,
-  paritionStrategy: doNothingStrategy
+  paritionStrategy: doNothingStrategy,
 });
 
 QueryService.FromAuthConfig({
@@ -285,7 +441,7 @@ QueryService.FromAuthConfig({
   domain: "domain",
   clientId: "client_id",
   clientSecret: "client_secret",
-  paritionStrategy: doNothingStrategy
+  paritionStrategy: doNothingStrategy,
 });
 ```
 
@@ -299,8 +455,8 @@ QueryService.FromApiKey({
   key: string,
   retryOptions: {
     times: 3,
-    delayRate: 1000
-  }
+    delayRate: 1000,
+  },
 });
 
 QueryService.FromAuthConfig({
@@ -311,8 +467,8 @@ QueryService.FromAuthConfig({
   clientSecret: "client_secret",
   retryOptions: {
     times: 3,
-    delayRate: 1000
-  }
+    delayRate: 1000,
+  },
 });
 ```
 
@@ -327,8 +483,8 @@ QueryService.FromApiKey({
   circuitBreakerOptions: {
     maxBreakerFailures: 3,
     resetTimeout: 60000,
-    breakerDescription: "Circuit Breaker Open"
-  }
+    breakerDescription: "Circuit Breaker Open",
+  },
 });
 
 QueryService.FromAuthConfig({
@@ -340,8 +496,8 @@ QueryService.FromAuthConfig({
   circuitBreakerOptions: {
     maxBreakerFailures: 3,
     resetTimeout: 60000,
-    breakerDescription: "Circuit Breaker Open"
-  }
+    breakerDescription: "Circuit Breaker Open",
+  },
 });
 ```
 
@@ -354,8 +510,8 @@ QueryService.FromApiKey({
   baseUrl: string,
   key: string,
   bulkheadOptions: {
-    parallelism: 10
-  }
+    parallelism: 10,
+  },
 });
 
 QueryService.FromAuthConfig({
@@ -365,8 +521,8 @@ QueryService.FromAuthConfig({
   clientId: "client_id",
   clientSecret: "client_secret",
   bulkheadOptions: {
-    parallelism: 10
-  }
+    parallelism: 10,
+  },
 });
 ```
 
