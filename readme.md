@@ -103,7 +103,7 @@ marketAssessmentTimeSeriesQuery = qs
   .InRelativeInterval(RelativeIntervalType.RollingMonth);
 ```
 
-To construct an Actual Time Series the following must be provided.
+To construct a Market assessment the following must be provided.
 
 | Versioned Query        | Description                                                                 |
 | ---------------------- | --------------------------------------------------------------------------- |
@@ -127,6 +127,28 @@ To construct an Auction Time Series the following must be provided.
 | Auction Query          | Description                                                                 |
 | ---------------------- | --------------------------------------------------------------------------- |
 | Curve Selection        | A [curve selection](#curve-selection)                                       |
+| Time Extraction Window | An [extraction time window](#time-extraction-window) for data to be queried |
+
+## Bid Ask Time Series
+
+```javascript
+import { QueryService } from "artesian-sdk";
+
+const { Granularity, RelativeIntervalType } = QueryService;
+
+marketAssessmentTimeSeriesQuery = qs
+  .CreateBidAsk()
+  .ForFilterId(15)
+  .ForProducts(["M+1", "M+2"])
+  .InRelativeInterval(RelativeIntervalType.RollingMonth);
+```
+
+To construct a Bid Ask the following must be provided.
+
+| Versioned Query        | Description                                                                 |
+| ---------------------- | --------------------------------------------------------------------------- |
+| Curve Selection        | A [curve selection](#curve-selection)                                       |
+| Product                | An array of Products                                                        |
 | Time Extraction Window | An [extraction time window](#time-extraction-window) for data to be queried |
 
 ## Running a Query
@@ -385,6 +407,32 @@ writeMarketData.AddData(
 );
 
 await writeMarketData.Save(getUTCDate(new Date()));
+```
+
+### Bid Ask Time Series
+
+`EditMarketAssessment` starts the write mode for a Bid Ask. Checks are done to verify registration and MarketDataType to verify it is a Bid Ask.
+Using `AddData` to provide a local date time and a BidAskValue to be written.
+
+```javascript
+var writeMarketData = marketData.EditBidAsk();
+
+type bidAskValue = {
+  bestBidPrice?: number;
+  bestAskPrice?: number;
+  bestBidQuantity?: number;
+  bestAskQuantity?: number;
+  lastPrice?: number;
+  lastQuantity?: number;
+};
+
+writeMarketData.AddData(
+  new Date("2020-01-01"),
+  "Dec-20",
+  bidAskValue
+);
+
+await writeMarketData.Save(new Date());
 ```
 
 ## Advanced Configuration

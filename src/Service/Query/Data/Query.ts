@@ -47,6 +47,10 @@ export type MasQueryParams = QueryParamsWithInterval & {
   products: string[];
 };
 
+export type BidAskQueryParams = QueryParamsWithInterval & {
+  products: string[];
+};
+
 export type VersionSelection = LastN | MUV | LastOf | Version;
 export type LastN = { tag: VersionSelectionType.LastN; val: number };
 export type MUV = { tag: VersionSelectionType.MUV };

@@ -157,8 +157,8 @@ export const validateUpsertCurveData = (upsertCurveData:UpsertCurveData) => {
         if(upsertCurveData.version != null)
             throw new Error("UpsertCurveData Version must be NULL if Rows are NULL");
         
-        if((upsertCurveData.marketAssessment == null || upsertCurveData.marketAssessment.length == 0) && (upsertCurveData.auctionRows == null || upsertCurveData.auctionRows.length == 0))
-            throw new Error("UpsertCurveData MarketAssessment/Bids must be valorized if Rows are NULL");
+        if((upsertCurveData.marketAssessment == null || upsertCurveData.marketAssessment.length == 0) && (upsertCurveData.auctionRows == null || upsertCurveData.auctionRows.length == 0) && (upsertCurveData.bidAsk == null || upsertCurveData.bidAsk.length == 0))
+            throw new Error("UpsertCurveData MarketAssessment/Auctions/BidAsks must be valorized if Rows are NULL");
     }
     else
     {
@@ -166,7 +166,10 @@ export const validateUpsertCurveData = (upsertCurveData:UpsertCurveData) => {
             throw new Error("UpsertCurveData MarketAssessment must be NULL if Rows are Valorized");
 
         if (upsertCurveData.auctionRows != null)
-            throw new Error("UpsertCurveData Bids must be NULL if Rows are Valorized");
+            throw new Error("UpsertCurveData Auctions must be NULL if Rows are Valorized");
+
+        if (upsertCurveData.bidAsk != null)
+            throw new Error("UpsertCurveData BidAsk must be NULL if Rows are Valorized");
 
         if(upsertCurveData.rows != undefined){
             var iterator = upsertCurveData.rows.keys();
@@ -182,8 +185,8 @@ export const validateUpsertCurveData = (upsertCurveData:UpsertCurveData) => {
 
     if(upsertCurveData.marketAssessment == null)
     {
-        if ((upsertCurveData.rows == null || upsertCurveData.rows.length == 0) && (upsertCurveData.auctionRows == null || upsertCurveData.auctionRows.length == 0))
-            throw new Error("UpsertCurveData Rows/Bids must be valorized if MarketAssesment are NULL");
+        if ((upsertCurveData.rows == null || upsertCurveData.rows.length == 0) && (upsertCurveData.auctionRows == null || upsertCurveData.auctionRows.length == 0) && (upsertCurveData.bidAsk == null || upsertCurveData.bidAsk.length == 0))
+            throw new Error("UpsertCurveData Rows/Auctions/BidAsks must be valorized if MarketAssesment are NULL");
     }
     else
     {
@@ -191,21 +194,27 @@ export const validateUpsertCurveData = (upsertCurveData:UpsertCurveData) => {
             throw new Error("UpsertCurveData Rows must be NULL if MarketAssessment are Valorized");
 
         if (upsertCurveData.auctionRows != null)
-            throw new Error("UpsertCurveData Bids must be NULL if MarketAssessment are Valorized");
+            throw new Error("UpsertCurveData Auctions must be NULL if MarketAssessment are Valorized");
+
+        if (upsertCurveData.bidAsk != null)
+            throw new Error("UpsertCurveData BidAsk must be NULL if MarketAssessment are Valorized");
     }
 
     if (upsertCurveData.auctionRows == null)
     {
-        if ((upsertCurveData.rows == null || upsertCurveData.rows.length == 0) && (upsertCurveData.marketAssessment == null || upsertCurveData.marketAssessment.length == 0))
-            throw new Error("UpsertCurveData Rows/MarketAssessment must be valorized if Bids are NULL");
+        if ((upsertCurveData.rows == null || upsertCurveData.rows.length == 0) && (upsertCurveData.marketAssessment == null || upsertCurveData.marketAssessment.length == 0) && (upsertCurveData.bidAsk == null || upsertCurveData.bidAsk.length == 0))
+            throw new Error("UpsertCurveData Rows/MarketAssessment/BidAsks must be valorized if Auctions are NULL");
     }
     else
     {
         if (upsertCurveData.rows != null)
-            throw new Error("UpsertCurveData Rows must be NULL if Bids are Valorized");
+            throw new Error("UpsertCurveData Rows must be NULL if Auctions are Valorized");
 
         if (upsertCurveData.marketAssessment != null)
-            throw new Error("UpsertCurveData MarketAssesment must be NULL if Bids are Valorized");
+            throw new Error("UpsertCurveData MarketAssesment must be NULL if Auctions are Valorized");
+
+        if (upsertCurveData.bidAsk != null)
+            throw new Error("UpsertCurveData BidAsk must be NULL if Auctions are Valorized");
     }
 }
 /**

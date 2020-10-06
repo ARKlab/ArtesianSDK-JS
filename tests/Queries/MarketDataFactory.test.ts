@@ -304,4 +304,80 @@ test("MarketData Factory Market Assessment", async () => {
   expect(getMoxiosUrl().method).toEqual("post");
 });
 
+test("MarketData Factory Bid Ask", async () => {
+  const mds = MarketDataService.FromApiKey(cfg);
+
+  moxios.uninstall();
+  moxios.install();
+  let x: Output = {
+    MarketDataId: 0,
+    ProviderName: "TestProvider",
+    MarketDataName: "TestMarketDataName",
+    OriginalGranularity: Granularity.Day,
+    Type: MarketDataType.BidAsk,
+    OriginalTimezone: "CET",
+    AggregationRule: AggregationRule.Undefined,
+    Transform: {
+      id: 1,
+      name: "TimeTName",
+      eTag: "00000000-0000-0000-0000-000000000000",
+      definedBy: TransformDefinitionType.System,
+      type: TransformType.SimpleShift
+    },
+    LastUpdated: new Date(),
+    Created: new Date()
+  };
+
+  moxios.stubRequest(/.*/, { response: x });
+
+  var marketDataEntity: Input = {
+    MarketDataId: 0,
+    ProviderName: "TestProvider",
+    MarketDataName: "TestMarketData",
+    OriginalGranularity: Granularity.Day,
+    Type: MarketDataType.BidAsk,
+    OriginalTimezone: "CET",
+    AggregationRule: AggregationRule.Undefined
+  };
+  var marketData = mds.MarketDataServiceExtensions.getMarketDataReference({
+    provider: marketDataEntity.ProviderName,
+    name: marketDataEntity.MarketDataName
+  });
+
+  await marketData.Register(marketDataEntity);
+
+  var RegisterMarketData = await marketData.isRegistered();
+  expect(RegisterMarketData).toBe(true);
+
+  await marketData.update();
+
+  await marketData.load();
+
+  expect(marketData.metaData.aggregationRule).toBe(AggregationRule.Undefined);
+
+  var writeMarketData = marketData.editBidAsk(marketData);
+
+  var bidAskValue = {
+    bestBidPrice: 47,
+    bestAskPrice: 35,
+    bestBidQuantity: 41,
+    bestAskQuantity: 16,
+    lastPrice: 23,
+    lastQuantity: 78
+  };
+
+  writeMarketData.AddData(
+    new Date(2018, 11, 28),
+    "Dec-18",
+    bidAskValue
+  );
+  await writeMarketData.Save(getUTCDate(new Date()));
+  expect(
+    getMoxiosUrl()
+      .url.split("/")
+      .slice(-2)
+  ).toEqual(["marketdata", "entity"]);
+  expect(getMoxiosUrl().method).toEqual("post");
+});
+
 //#endregion

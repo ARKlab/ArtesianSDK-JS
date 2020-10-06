@@ -8,6 +8,7 @@ import { ActualQuery } from "./ActualQuery";
 import { AuctionQuery } from './AuctionQuery';
 import * as VQ from "./VersionedQuery";
 import { MasQuery } from "./MasQuery";
+import { BidAskQuery } from './BidAskQuery';
 import { QueryRoute, QueryVersion } from "./Data/Constants";
 import { CircuitBreakerOptions } from "../../Common/CircuitBreaker";
 import { RetryOptions } from "../../Common/Retry";
@@ -64,6 +65,15 @@ class QueryService {
    */
   CreateMas() {
     return new MasQuery(
+      this.client,
+      this.cfg.paritionStrategy || IdPartitionStrategy(this.cfg)
+    );
+  }
+   /**
+   * Create Market Assessment Time Serie Query
+   */
+  CreateBidAsk() {
+    return new BidAskQuery(
       this.client,
       this.cfg.paritionStrategy || IdPartitionStrategy(this.cfg)
     );

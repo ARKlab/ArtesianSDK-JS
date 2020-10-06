@@ -6,6 +6,7 @@ import {
   AuctionQueryParams,
   VersionedQueryParams,
   MasQueryParams,
+  BidAskQueryParams,
   QueryParamsWithRange
 } from "../Data/Query";
 import { partitionIds } from "../../../Common/ArtesianUtils";
@@ -16,6 +17,7 @@ export interface IPartitionStrategy {
   Auction: (a: AuctionQueryParams[]) => AuctionQueryParams[];
   Versioned: (a: VersionedQueryParams[]) => VersionedQueryParams[];
   Mas: (a: MasQueryParams[]) => MasQueryParams[];
+  BidAsk: (a: BidAskQueryParams[]) => BidAskQueryParams[];
 }
 export function IdPartitionStrategy(cfg: {
   queryOptions?: queryOptions;
@@ -24,7 +26,8 @@ export function IdPartitionStrategy(cfg: {
     Actual: R.chain(expandParamsWithInterval(cfg)),
     Auction: R.chain(expandParams(cfg)),
     Versioned: R.chain(expandParamsWithInterval(cfg)),
-    Mas: R.chain(expandParamsWithInterval(cfg))
+    Mas: R.chain(expandParamsWithInterval(cfg)),
+    BidAsk: R.chain(expandParamsWithInterval(cfg))
   };
 }
 

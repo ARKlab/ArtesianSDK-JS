@@ -45,6 +45,7 @@ export enum MarketDataType {
   VersionedTimeSerie = "VersionedTimeSerie",
   MarketAssessment = "MarketAssessment",
   AuctionTimeSerie = "Auction",
+  BidAsk = "BidAsk",
 }
 /**
  * Aggregation Rule Enums

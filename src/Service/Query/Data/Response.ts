@@ -139,3 +139,45 @@ export type MasRow = {
   volumeGiven?: number;
   volumeTotal?: number;
 };
+
+export type InternalBidAskRow = {
+  P: string;
+  N: string;
+  ID: number;
+  PR: string;
+  T: Date;
+  bbp?: number;
+  bbq?: number;
+  bap?: number;
+  baq?: number;
+  lp ?: number;
+  lq ?: number;
+};
+export function bidAskMapper(row: InternalBidAskRow): BidAskRow {
+  return {
+    providerName: row.P,
+    curveName: row.N,
+    tsId: row.ID,
+    product: row.PR,
+    time: row.T,
+    bestBidPrice: row.bbp,
+    bestAskPrice: row.bap,
+    bestBidQuantity: row.bbq,
+    bestAskQuantity: row.baq,
+    lastPrice: row.lp,
+    lastQuantity: row.lq,
+  };
+}
+export type BidAskRow = {
+  providerName: string;
+  curveName: string;
+  tsId: number;
+  product: string;
+  time: Date;
+  bestBidPrice?: number;
+  bestAskPrice?: number;
+  bestBidQuantity?: number;
+  bestAskQuantity?: number;
+  lastPrice?: number;
+  lastQuantity?: number;
+};
