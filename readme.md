@@ -411,7 +411,7 @@ await writeMarketData.Save(getUTCDate(new Date()));
 
 ### Bid Ask Time Series
 
-`EditMarketAssessment` starts the write mode for a Bid Ask. Checks are done to verify registration and MarketDataType to verify it is a Bid Ask.
+`EditBidAsk` starts the write mode for a Bid Ask. Checks are done to verify registration and MarketDataType to verify it is a Bid Ask.
 Using `AddData` to provide a local date time and a BidAskValue to be written.
 
 ```javascript
