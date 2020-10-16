@@ -10,6 +10,7 @@ import { MarketDataMetadata } from "./MarketDataMetadata";
 import { ActualTimeSerie } from "./ActualTimeSerie";
 import { MarketAssessment } from "./MarketAssessment";
 import { VersionedTimeSerie } from "./VersionedTimeSerie";
+import { BidAsk } from './BidAsk';
 import { isNullOrWhitespace } from "../Data/Enums";
 
 export class MarketData {
@@ -187,5 +188,18 @@ export class MarketData {
     var auction = new AuctionTimeSerie(marketData);
 
     return auction;
+  }
+
+  editBidAsk(marketData: MarketData) {
+    if (this._entity == null) {
+      throw new Error("Bid Ask is not yet registered");
+    }
+    if (this._entity.Type != MarketDataType.BidAsk) {
+      throw new Error("Entity is not aBidAsk");
+    }
+
+    var bidAsk = new BidAsk(marketData);
+    
+    return bidAsk;
   }
 }

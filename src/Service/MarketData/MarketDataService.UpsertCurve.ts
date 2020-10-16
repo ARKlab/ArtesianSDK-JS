@@ -39,6 +39,10 @@ export type UpsertCurveData = {
   deferCommandExecution?: boolean;
   deferDataGeneration?: boolean;
   auctionRows?: Array<{ Key: DateTime; Value: AuctionBid }>;
+  bidAsk?: {
+    Key: DateTime;
+    Value: { Key: Product; Value: BidAskValue }[];
+  }[];
 };
 
 type AuctionBid = {
@@ -55,4 +59,14 @@ export type MarketAssessmentValue = {
   volumePaid?: number;
   volueGiven?: number;
   volume?: number;
+};
+
+export type BidAskValue = {
+  bestBidPrice?: number;
+  bestAskPrice?: number;
+  bestBidQuantity?: number;
+  bestAskQuantity?: number;
+  lastPrice?: number;
+  lastQuantity?: number;
+
 };

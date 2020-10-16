@@ -57,6 +57,14 @@ export enum AddAssessmentOperationResult {
   IllegalReferenceDate = 2,
 }
 /**
+ * AddBidAskOperationResult Enum
+ */
+export enum AddBidAskOperationResult {
+  BidAskAdded = 0,
+  ProductAlreadyPresent = 1,
+  IllegalReferenceDate = 2,
+}
+/**
  * DayOfWeek Enum
  */
 export enum DayOfWeek {
