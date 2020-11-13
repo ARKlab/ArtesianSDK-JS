@@ -5,23 +5,39 @@ import { CreateWrapper } from "./ApiResilienceStrategy";
 import { Auth0Service } from "./Auth0Service";
 import { Auth0Cache } from "./Auth0Cache";
 
+function runtimeCheck() {
+  const platform = require('platform');
+  if ( typeof self === 'undefined'){
+    // Node
+    return `Node:${process.version}`;
+  } else if (platform.name) {
+    // Browser
+    return `${platform.name}:${platform.version}`;
+  } else {
+    return `Unknown`;
+  }
+}
+
 export function axiosWrapper(
   cfg: ArtesianServiceConfig
 ): <A>(r: AxiosRequestConfig) => Promise<A> {
   const wrapper = cfg.executionStrategy || CreateWrapper(cfg);
-  const getHeaders = GetHeaders(cfg);
-  async function Request<A>(config: AxiosRequestConfig) {
-    const headers = await getHeaders();
+    const getAuthHeaders = GetAuthHeaders(cfg);
+    async function Request<A>(config: AxiosRequestConfig) {
+    const authHeaders = await getAuthHeaders();
+    
+    const os = require('os');
+    const runtime = runtimeCheck();
 
     return axios
       .request<A>(
         R.mergeDeepRight(
           {
-            headers: { "user-agent": "ArtesianSDK-JS v0.0.6" }
+                headers: { "X-Artesian-Agent": `ArtesianSDK-JS:${process.env.npm_package_version},${os.type()+"-"+os.arch()}:${os.release()},${runtime}`}
           },
           {
             ...config,
-            ...headers
+            ...authHeaders
           }
         )
       )
@@ -30,7 +46,7 @@ export function axiosWrapper(
   return wrapper(Request);
 }
 
-function GetHeaders(
+function GetAuthHeaders(
   cfg: ArtesianServiceConfig
 ): () => Promise<{ headers: any }> {
   switch (cfg.authType.tag) {
