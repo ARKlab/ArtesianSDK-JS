@@ -111,7 +111,7 @@ function fillQueryParam(q: ActualQueryParams): string {
 
   switch (q.fill?.fillerType) {
     case FillerKindType.Null:
-      case FillerKindType.NoFill:
+    case FillerKindType.NoFill:
       return `fillerK=${q.fill.fillerType}`;
     case FillerKindType.LatestValidValue:
       return `fillerK=${q.fill.fillerType}&fillerP=${q.fill.fillerPeriod}`;
