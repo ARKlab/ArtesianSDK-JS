@@ -1,6 +1,6 @@
 import * as R from "ramda";
 import * as Q from "./QueryWithExtractionInterval";
-import { BidAskQueryParams, getCurveSelectionParamsWithInterval } from "./Data/Query";
+import { BidAskQueryParams, BidAskValue, FillerKindType, getCurveSelectionParamsWithInterval } from "./Data/Query";
 import { BidAskRow, InternalBidAskRow, bidAskMapper } from "./Data/Response";
 
 export class BidAskQuery extends Q.QueryWithExtractionInterval {
@@ -11,6 +11,37 @@ export class BidAskQuery extends Q.QueryWithExtractionInterval {
    */
   ForProducts(products: string[]) {
     this._queryParams.products = products;
+    return this;
+  }
+  /**
+   * Set the Filler Strategy to Null
+   */
+  WithFillNull() {
+    this._queryParams.fill = { fillerType: FillerKindType.Null };
+    return this;
+  }
+  /**
+   * Set the Filler Strategy to None
+   */
+  WithFillNone() {
+    this._queryParams.fill = { fillerType: FillerKindType.NoFill };
+    return this;
+  }
+  /**
+   * Set the Filler Strategy to Latest Value
+   */
+  WithFillLatestValue(p: string) {
+    this._queryParams.fill = {
+      fillerType: FillerKindType.LatestValidValue,
+      fillerPeriod: p,
+    };
+    return this;
+  }
+  /**
+   * Set the Filler Strategy to Custom
+   */
+  WithFillCustomValue(val: BidAskValue){
+    this._queryParams.fill = {fillerType: FillerKindType.CustomValue, fillerValue:val}
     return this;
   }
   /**
@@ -37,6 +68,7 @@ function buildUrl(q: BidAskQueryParams): string {
 function getUrlQueryParams(q: BidAskQueryParams): string {
   return [
     Q.getUrlQueryParams(q),
+    fillQueryParam(q),
     getCurveSelectionParamsWithInterval(q),
     getProductParams(q)
   ]
@@ -49,4 +81,29 @@ function validateProducts(q: Partial<BidAskQueryParams>): Promise<BidAskQueryPar
 }
 function getProductParams(q: BidAskQueryParams): string {
   return "p=" + q.products.map(encodeURIComponent).join(",");
+}
+
+function fillQueryParam(q: BidAskQueryParams): string {
+  if (q.fill == null) return "";
+
+  switch (q.fill?.fillerType) {
+    case FillerKindType.Null:
+    case FillerKindType.NoFill:
+      return `fillerK=${q.fill.fillerType}`;
+    case FillerKindType.LatestValidValue:
+      return `fillerK=${q.fill.fillerType}&fillerP=${q.fill.fillerPeriod}`;
+    case FillerKindType.CustomValue:
+      return [
+        ["fillerK", q.fill.fillerType],
+        ["fillerDVbbp", q.fill.fillerValue.bestBidPrice],
+        ["fillerDVbap", q.fill.fillerValue.bestAskPrice],
+        ["fillerDVbbq", q.fill.fillerValue.bestBidQuantity],
+        ["fillerDVbaq", q.fill.fillerValue.bestAskQuantity],
+        ["fillerDVlp", q.fill.fillerValue.lastPrice],
+        ["fillerDVlq", q.fill.fillerValue.lastQuantity],
+      ]
+        .filter(([_, val]) => Boolean(val))
+        .map((x) => x.join("="))
+        .join("&");
+  }
 }

@@ -54,6 +54,79 @@ describe("ActualQueries", () => {
           p: `${encodeURIComponent("M+1")},${encodeURIComponent("M+2")}`
         })
       ));
+  describe("Fills", () => {
+    test("Null Fill", () =>
+      qs
+        .CreateMas()
+        .ForMarketData([100000001])
+        .ForProducts(["M+1", "M+2"])
+        .InAbsoluteDateRange(new Date("2018-1-1"), new Date("2018-1-10"))
+        .WithFillNull()
+        .Execute()
+        .then(() => {
+          expect(getMoxiosUrl()).toMatchObject({
+            qs: { fillerK: "Null" },
+          });
+        }));
+    test("No Fill", () =>
+      qs
+        .CreateMas()
+        .ForMarketData([100000001])
+        .ForProducts(["M+1", "M+2"])
+        .InAbsoluteDateRange(new Date("2018-1-1"), new Date("2018-1-10"))
+        .WithFillNone()
+        .Execute()
+        .then(() => {
+          expect(getMoxiosUrl()).toMatchObject({
+            qs: { fillerK: "NoFill" },
+          });
+        }));
+    test("LatestValidValue", () =>
+      qs
+        .CreateMas()
+        .ForMarketData([100000001])
+        .ForProducts(["M+1", "M+2"])
+        .InAbsoluteDateRange(new Date("2018-1-1"), new Date("2018-1-10"))
+        .WithFillLatestValue("D-1")
+        .Execute()
+        .then(() => {
+          expect(getMoxiosUrl()).toMatchObject({
+            qs: { fillerK: "LatestValidValue", fillerP: "D-1" },
+          });
+        }));
+    test("CustomValue", () =>
+      qs
+        .CreateMas()
+        .ForMarketData([100000001])
+        .ForProducts(["M+1", "M+2"])
+        .InAbsoluteDateRange(new Date("2018-1-1"), new Date("2018-1-10"))
+        .WithFillCustomValue({
+          settlement: 1,
+          open: 2,
+          close: 3,
+          high: 4,
+          low: 5,
+          volumePaid: 6,
+          volueGiven: 7,
+          volume: 8,
+        })
+        .Execute()
+        .then(() => {
+          expect(getMoxiosUrl()).toMatchObject({
+            qs: {
+              fillerK: "CustomValue",
+              fillerDVs: "1",
+              fillerDVo: "2",
+              fillerDVc: "3",
+              fillerDVh: "4",
+              fillerDVl: "5",
+              fillerDVvp: "6",
+              fillerDVvg: "7",
+              fillerDVvt: "8",
+            },
+          });
+        }));
+  });
   test("Partitions Queries", async () => {
     const qs = QueryService.FromApiKey({
       baseUrl: "lel",

@@ -8,7 +8,8 @@ import {
   LastOfType,
   ExtractionRangeType,
   LastOf,
-  LastOfExtractionType
+  LastOfExtractionType,
+  FillerKindType
 } from "./Data/Query";
 import {
   InternalVersionedRow,
@@ -96,6 +97,37 @@ export class VersionedQuery extends Q.QueryWithExtractionInterval {
       tag: VersionSelectionType.Version,
       val
     };
+    return this;
+  }
+  /**
+   * Set the Filler Strategy to Null
+   */
+  WithFillNull() {
+    this._queryParams.fill = { fillerType: FillerKindType.Null };
+    return this;
+  }
+  /**
+   * Set the Filler Strategy to None
+   */
+  WithFillNone() {
+    this._queryParams.fill = { fillerType: FillerKindType.NoFill };
+    return this;
+  }
+  /**
+   * Set the Filler Strategy to Latest Value
+   */
+  WithFillLatestValue(p: string) {
+    this._queryParams.fill = {
+      fillerType: FillerKindType.LatestValidValue,
+      fillerPeriod: p,
+    };
+    return this;
+  }
+  /**
+   * Set the Filler Strategy to Custom
+   */
+  WithFillCustomValue(val: number){
+    this._queryParams.fill = {fillerType: FillerKindType.CustomValue, fillerValue:val}
     return this;
   }
   /**
@@ -216,9 +248,24 @@ function buildVersionRoute(q: VersionedQueryParams): string {
 function getUrlQueryParams(q: VersionedQueryParams): string {
   return [
     Q.getUrlQueryParams(q),
+    fillQueryParam(q),
     getCurveSelectionParamsWithInterval(q),
     addTimeTransformQueryParam(q)
   ]
     .filter(Boolean)
     .join("&");
+}
+function fillQueryParam(q: VersionedQueryParams): string {
+  if(q.fill == null)
+    return "";
+
+  switch (q.fill?.fillerType) {
+    case FillerKindType.Null:
+      case FillerKindType.NoFill:
+      return `fillerK=${q.fill.fillerType}`;
+    case FillerKindType.LatestValidValue:
+      return `fillerK=${q.fill.fillerType}&fillerP=${q.fill.fillerPeriod}`;
+    case FillerKindType.CustomValue:
+      return `fillerK=${q.fill.fillerType}&fillerDV=${q.fill.fillerValue}`;
+  };
 }

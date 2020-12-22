@@ -84,6 +84,60 @@ describe("ActualQueries", () => {
           });
         }));
   });
+  describe("Fills", () => {
+    test("Null Fill", () =>
+      qs
+        .CreateActual()
+        .ForMarketData([100000001])
+        .InGranularity(Granularity.Day)
+        .InAbsoluteDateRange(new Date("2018-1-1"), new Date("2018-1-10"))
+        .WithFillNull()
+        .Execute()
+        .then(() => {
+          expect(getMoxiosUrl()).toMatchObject({
+            qs: { fillerK: "Null" },
+          });
+        }));
+    test("No Fill", () =>
+      qs
+        .CreateActual()
+        .ForMarketData([100000001])
+        .InGranularity(Granularity.Day)
+        .InAbsoluteDateRange(new Date("2018-1-1"), new Date("2018-1-10"))
+        .WithFillNone()
+        .Execute()
+        .then(() => {
+          expect(getMoxiosUrl()).toMatchObject({
+            qs: { fillerK: "NoFill" },
+          });
+        }));
+    test("LatestValidValue", () =>
+      qs
+        .CreateActual()
+        .ForMarketData([100000001])
+        .InGranularity(Granularity.Day)
+        .InAbsoluteDateRange(new Date("2018-1-1"), new Date("2018-1-10"))
+        .WithFillLatestValue("D-1")
+        .Execute()
+        .then(() => {
+          expect(getMoxiosUrl()).toMatchObject({
+            qs: { fillerK: "LatestValidValue", fillerP: "D-1" },
+          });
+        }));
+    test("CustomValue", () =>
+      qs
+        .CreateActual()
+        .ForMarketData([100000001])
+        .InGranularity(Granularity.Day)
+        .InAbsoluteDateRange(new Date("2018-1-1"), new Date("2018-1-10"))
+        .WithFillCustomValue(10)
+        .Execute()
+        .then(() => {
+          expect(getMoxiosUrl()).toMatchObject({
+            qs: { fillerK: "CustomValue", fillerDV: "10" },
+          });
+        }));
+  });
   test("Partitions Queries - 1", async () => {
     const qs = QueryService.FromApiKey({
       baseUrl: "lel",
