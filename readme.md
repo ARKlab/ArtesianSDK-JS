@@ -271,6 +271,58 @@ Other recommended libraries to build a period string are:
 - [luxon](https://moment.github.io/luxon/index.html)
 - [moment.js](http://momentjs.com/)
 
+### Filler Strategy
+
+All extraction types (Actual,Versioned, Market Assessment and BidAsk) have an optional filler strategy.
+
+```javascript
+var versionedSeries = await qs        
+  .CreateVersioned()
+  .ForMarketData([100000001])
+  .ForLastNVersions(1)
+  .InGranularity(Granularity.Day)
+  .InAbsoluteDateRange(new Date("2018-1-1"), new Date("2018-1-10"))
+  .WithFillLatestValue("P5D")
+  .Execute()
+```
+
+Null
+
+```javascript
+ .WithFillNull()
+```
+
+None
+
+```javascript
+ .WithFillNone()
+```
+
+Custom Value
+
+```javascript
+ //Timeseries
+ .WithFillCustomValue(123)
+ // Market Assessment
+ .WithFillCustomValue({
+    settlement: 123,
+    open: 456,
+    close: 789,
+    high: 321,
+    low: 654,
+    volumePaid: 987,
+    volueGiven: 213,
+    volume: 435,
+  })
+```
+
+Latest Value
+
+```javascript
+ .WithLFillLatestValue("P5D")
+```
+
+
 ## MarketData Service
 
 Using the ArtesianServiceConfig `cfg` we create an instance of the MarketDataService which is used to retrieve and edit

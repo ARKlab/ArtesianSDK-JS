@@ -29,6 +29,7 @@ export function getCurveSelectionParamsWithRange(q: QueryParamsWithRange): strin
 export type ActualQueryParams = QueryParamsWithInterval & {
   granularity: Granularity;
   tr?: number;
+  fill?: CustomFill<number>
 };
 
 export type AuctionQueryParams = QueryParamsWithRange
@@ -36,6 +37,7 @@ export type AuctionQueryParams = QueryParamsWithRange
 export type VersionedQueryParams = QueryParamsWithInterval & {
   granularity: Granularity;
   tr?: number;
+  fill?: CustomFill<number>
   versionSelection: VersionSelection;
 };
 
@@ -43,11 +45,32 @@ export function addTimeTransformQueryParam(q: { tr?: number }): string {
   return q.tr ? "tr=" + q.tr.toString() : "";
 }
 
+type MarketAssessmentValue = {
+  settlement?: number;
+  open?: number;
+  close?: number;
+  high?: number;
+  low?: number;
+  volumePaid?: number;
+  volueGiven?: number;
+  volume?: number;
+};
+
 export type MasQueryParams = QueryParamsWithInterval & {
+  fill?: CustomFill<MarketAssessmentValue>;
   products: string[];
 };
 
+export type BidAskValue = {
+  bestBidPrice?: number;
+  bestAskPrice?: number;
+  bestBidQuantity?: number;
+  bestAskQuantity?: number;
+  lastPrice?: number;
+  lastQuantity?: number;
+}
 export type BidAskQueryParams = QueryParamsWithInterval & {
+  fill?: CustomFill<BidAskValue>;
   products: string[];
 };
 
@@ -132,3 +155,26 @@ export enum RelativeIntervalType {
   QuarterToDate,
   YearToDate
 }
+
+export enum FillerKindType {
+  Null="Null",
+  NoFill="NoFill",
+  LatestValidValue="LatestValidValue",
+  CustomValue="CustomValue"
+}
+
+type CustomFill<a> =
+  | {
+      fillerType: FillerKindType.Null;
+    }
+  | {
+      fillerType: FillerKindType.NoFill;
+    }
+  | {
+      fillerType: FillerKindType.LatestValidValue;
+      fillerPeriod: string;
+    }
+  | {
+      fillerType: FillerKindType.CustomValue;
+      fillerValue: a;
+    };

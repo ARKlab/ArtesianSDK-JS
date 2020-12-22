@@ -1,9 +1,11 @@
 import * as R from "ramda";
 import * as Q from "./QueryWithExtractionInterval";
+import * as QueryBase from "./Query";
 import {
   ActualQueryParams,
   getCurveSelectionParamsWithInterval,
-  addTimeTransformQueryParam
+  addTimeTransformQueryParam,
+  FillerKindType,
 } from "./Data/Query";
 import { ActualRow, InternalActualRow, actualMapper } from "./Data/Response";
 import { Granularity } from "../../Data/Enums";
@@ -35,6 +37,37 @@ export class ActualQuery extends Q.QueryWithExtractionInterval {
     return this;
   }
   /**
+   * Set the Filler Strategy to Null
+   */
+  WithFillNull() {
+    this._queryParams.fill = { fillerType: FillerKindType.Null };
+    return this;
+  }
+  /**
+   * Set the Filler Strategy to None
+   */
+  WithFillNone() {
+    this._queryParams.fill = { fillerType: FillerKindType.NoFill };
+    return this;
+  }
+  /**
+   * Set the Filler Strategy to Latest Value
+   */
+  WithFillLatestValue(p: string) {
+    this._queryParams.fill = {
+      fillerType: FillerKindType.LatestValidValue,
+      fillerPeriod: p,
+    };
+    return this;
+  }
+  /**
+   * Set the Filler Strategy to Custom
+   */
+  WithFillCustomValue(val: number){
+    this._queryParams.fill = {fillerType: FillerKindType.CustomValue, fillerValue:val}
+    return this;
+  }
+  /**
    * Execute the Query
    */
   Execute(): Promise<ActualRow[]> {
@@ -57,16 +90,32 @@ function buildUrl(q: ActualQueryParams): string {
   return (
     "ts/" +
     `${Granularity[q.granularity]}/` +
-    `${Q.buildExtractionRangeRoute(q)}` +
+    `${Q.buildExtractionRangeRoute(q)}` + 
     `?${getUrlQueryParams(q)}`
   );
 }
 function getUrlQueryParams(q: ActualQueryParams): string {
   return [
-    Q.getUrlQueryParams(q),
+    QueryBase.getUrlQueryParams(q),
+    fillQueryParam(q),
     getCurveSelectionParamsWithInterval(q),
     addTimeTransformQueryParam(q)
   ]
     .filter(Boolean)
     .join("&");
+}
+
+function fillQueryParam(q: ActualQueryParams): string {
+  if(q.fill == null)
+    return "";
+
+  switch (q.fill?.fillerType) {
+    case FillerKindType.Null:
+      case FillerKindType.NoFill:
+      return `fillerK=${q.fill.fillerType}`;
+    case FillerKindType.LatestValidValue:
+      return `fillerK=${q.fill.fillerType}&fillerP=${q.fill.fillerPeriod}`;
+    case FillerKindType.CustomValue:
+      return `fillerK=${q.fill.fillerType}&fillerDV=${q.fill.fillerValue}`;
+  };
 }
