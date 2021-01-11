@@ -84,6 +84,7 @@ export enum Zone {
     SLOV = 'SLOV',
     SUD = 'SUD',
     SVIZ = 'SVIZ',
+    CALA = 'CALA',
 }
 
 export enum UnitType {
