@@ -43,7 +43,8 @@ export enum Market {
     MB3 = 'MB3',
     MB4 = 'MB4',
     MB5 = 'MB5',
-    MB6 = 'MB6'
+    MB6 = 'MB6',
+    MRR = 'MRR'
 }
 
 export enum Scope {
