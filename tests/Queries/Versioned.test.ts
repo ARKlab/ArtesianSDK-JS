@@ -263,6 +263,86 @@ describe("VersionedQueries", () => {
             }));
       });
     });
+    describe("ForMostRecent", () => {   //Add ForMostRecent Tests here.....
+      test("DateRange", () =>
+        qs
+          .CreateVersioned()
+          .ForMarketData([100000001])
+          .ForMostRecent(
+            VersionedQuery.inDateRange(
+              new Date("2018-1-1"),
+              new Date("2018-1-10")
+            )
+          )
+          .InGranularity(Granularity.Day)
+          .InAbsoluteDateRange(new Date("2018-1-1"), new Date("2018-1-10"))
+          .WithTimeTransform(SystemTimeTransform.THERMALYEAR)
+          .Execute()
+          .then(() => {
+            expect(
+              getMoxiosUrl()
+                .url.split("vts/")[1]
+                .split("/")
+                .slice(0, 3)
+            ).toEqual(["2018-01-01T00:00:00", "2018-01-10T00:00:00", "Day"]);
+          }));
+          test("DateTimeRange", () =>
+          qs
+            .CreateVersioned()
+            .ForMarketData([100000001])
+            .ForMostRecent(
+              VersionedQuery.inDateRange(
+                new Date("2018-01-01T12:30:00"),
+                new Date("2018-01-10T18:15:30")
+              )
+            )
+            .InGranularity(Granularity.Day)
+            .InAbsoluteDateRange(new Date("2018-01-01T12:30:00"), new Date("2018-01-10T18:15:30"))
+            .WithTimeTransform(SystemTimeTransform.THERMALYEAR)
+            .Execute()
+            .then(() => {
+              expect(
+                getMoxiosUrl()
+                  .url.split("vts/")[1]
+                  .split("/")
+                  .slice(0, 3)
+              ).toEqual(["2018-01-01T12:30:00", "2018-01-10T18:15:30", "Day"]);
+            }));
+        test("Period", () =>
+        qs
+          .CreateVersioned()
+          .ForMarketData([100000001])
+          .ForMostRecent(VersionedQuery.inPeriod("P5D"))
+          .InGranularity(Granularity.Day)
+          .InAbsoluteDateRange(new Date("2018-1-1"), new Date("2018-1-10"))
+          .WithTimeTransform(SystemTimeTransform.THERMALYEAR)
+          .Execute()
+          .then(() => {
+            expect(
+              getMoxiosUrl()
+                .url.split("vts/")[1]
+                .split("/")
+                .slice(0, 2)
+            ).toEqual(["P5D", "Day"]);
+          }));
+      test("PeriodRange", () =>
+        qs
+          .CreateVersioned()
+          .ForMarketData([100000001])
+          .ForMostRecent(VersionedQuery.inPeriodRange("P5D", "P10D"))
+          .InGranularity(Granularity.Day)
+          .InAbsoluteDateRange(new Date("2018-1-1"), new Date("2018-1-10"))
+          .WithTimeTransform(SystemTimeTransform.THERMALYEAR)
+          .Execute()
+          .then(() => {
+            expect(
+              getMoxiosUrl()
+                .url.split("vts/")[1]
+                .split("/")
+                .slice(0, 3)
+            ).toEqual(["P5D", "P10D", "Day"]);
+          }));
+    });
   });
   describe("Fills", () => {
     test("Null Fill", () =>
