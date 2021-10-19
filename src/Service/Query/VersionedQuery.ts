@@ -8,8 +8,10 @@ import {
   LastOfType,
   ExtractionRangeType,
   LastOf,
+  MostRecentExtractionType,
   LastOfExtractionType,
-  FillerKindType
+  FillerKindType,
+  ForMostRecent
 } from "./Data/Query";
 import {
   InternalVersionedRow,
@@ -54,6 +56,20 @@ export class VersionedQuery extends Q.QueryWithExtractionInterval {
     this._queryParams.versionSelection = {
       tag: VersionSelectionType.MUV
     };
+    return this;
+  }
+  /**
+   * Set For Most Recent date range version selection
+   * @param extraction the extraction selection
+   */
+  ForMostRecent(extraction: MostRecentExtractionType) {
+    if (Object.keys(ExtractionRangeType).indexOf(extraction.tag.toString()) == -1)
+      throw "Not valid extraction";
+
+    this._queryParams.versionSelection = {
+      tag: VersionSelectionType.ForMostRecent,
+      extraction
+    }
     return this;
   }
   /**
@@ -186,6 +202,9 @@ export function inPeriodRange(
 function formatDate(d: Date) {
   return d.toISOString().split("T")[0];
 }
+function formatDateTime(d: Date) {
+  return d.toISOString().split(".")[0];
+}
 function validateVersionParams(
   q: Partial<VersionedQueryParams>
 ): Promise<VersionedQueryParams> {
@@ -196,6 +215,24 @@ function validateVersionParams(
   return Promise.resolve(q as VersionedQueryParams);
 }
 
+function buildMostRecentRoute(q: ForMostRecent): string {
+  switch (q.extraction.tag) {
+    case ExtractionRangeType.DateRange:
+      return (
+        `${formatDateTime(q.extraction.start)}/` +
+        `${formatDateTime(q.extraction.end)}`
+      );
+    case ExtractionRangeType.Period:
+      return (
+        `${q.extraction.Period}`
+      );
+    case ExtractionRangeType.PeriodRange:
+      return (
+        `${q.extraction.PeriodFrom}/` +
+        `${q.extraction.PeriodTo}`
+      );
+  }
+}
 function buildLastOfRoute(q: LastOf): string {
   switch (q.extraction.tag) {
     case ExtractionRangeType.DateRange:
@@ -207,7 +244,7 @@ function buildLastOfRoute(q: LastOf): string {
     case ExtractionRangeType.Period:
       return (
         `${VersionSelectionType[q.tag]}${LastOfType[q.lastOfType]}/` +
-        `${q.extraction.Period}/`
+        `${q.extraction.Period}`
       );
     case ExtractionRangeType.PeriodRange:
       return (
@@ -243,6 +280,8 @@ function buildVersionRoute(q: VersionedQueryParams): string {
       return "Last" + q.versionSelection.val;
     case VersionSelectionType.LastOf:
       return buildLastOfRoute(q.versionSelection);
+    case VersionSelectionType.ForMostRecent:
+      return buildMostRecentRoute(q.versionSelection);
   }
 }
 function getUrlQueryParams(q: VersionedQueryParams): string {

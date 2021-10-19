@@ -74,7 +74,7 @@ export type BidAskQueryParams = QueryParamsWithInterval & {
   products: string[];
 };
 
-export type VersionSelection = LastN | MUV | LastOf | Version;
+export type VersionSelection = LastN | MUV | LastOf | Version | ForMostRecent;
 export type LastN = { tag: VersionSelectionType.LastN; val: number };
 export type MUV = { tag: VersionSelectionType.MUV };
 export type LastOf = {
@@ -82,18 +82,24 @@ export type LastOf = {
   lastOfType: LastOfType;
   extraction: LastOfExtractionType;
 };
+export type ForMostRecent = {
+  tag: VersionSelectionType.ForMostRecent;
+  extraction: MostRecentExtractionType;
+};
 
 export enum LastOfType {
   Days,
   Months
 }
 export type LastOfExtractionType = DateRange | Period | PeriodRange;
+export type MostRecentExtractionType = DateRange | Period | PeriodRange;
 export type Version = { tag: VersionSelectionType.Version; val: Date };
 export enum VersionSelectionType {
   LastN,
   MUV,
   LastOf,
-  Version
+  Version,
+  ForMostRecent
 }
 export type CurveSelection = IdSelection | FilterSelection;
 
